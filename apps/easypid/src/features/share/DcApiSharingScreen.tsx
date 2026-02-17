@@ -66,23 +66,14 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
 
     if (!agent) return
 
-    const resolvedRequest = await resolveRequestForDcApi({ agent, request })
-      .then((resolvedRequest) => {
-        // We can't share multiple documents at the moment
-        if (resolvedRequest.formattedSubmission.entries.length > 1) {
-          throw new Error('Multiple cards requested, but only one card can be shared with the digital credentials api.')
-        }
-
-        return resolvedRequest
+    const resolvedRequest = await resolveRequestForDcApi({ agent, request }).catch((error) => {
+      agent.config.logger.error('Error getting credentials for dc api request', {
+        error,
       })
-      .catch((error) => {
-        agent.config.logger.error('Error getting credentials for dc api request', {
-          error,
-        })
 
-        // Not shown to the user
-        sendErrorResponseForDcApi('Presentation information could not be extracted')
-      })
+      // Not shown to the user
+      sendErrorResponseForDcApi('Presentation information could not be extracted')
+    })
 
     if (!resolvedRequest) return
 

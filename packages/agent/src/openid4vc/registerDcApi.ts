@@ -197,7 +197,7 @@ export async function registerCredentialsForDcApi(agent: EitherAgent) {
           claims: mapMdocAttributesToClaimDisplay(mdoc.issuerSignedNamespaces),
           iconDataUrl,
         },
-      } as const
+      } as const satisfies CredentialItem
     })
 
     const sdJwtCredentials = sdJwtVcRecords.map(async (record): Promise<CredentialItem> => {
@@ -224,7 +224,7 @@ export async function registerCredentialsForDcApi(agent: EitherAgent) {
           claims: mapSdJwtAttributesToClaimDisplay(sdJwtVc.prettyClaims),
           iconDataUrl,
         },
-      } as const
+      } as const satisfies CredentialItem
     })
 
     const credentials = await Promise.all([...sdJwtCredentials, ...mdocCredentials])
@@ -233,6 +233,7 @@ export async function registerCredentialsForDcApi(agent: EitherAgent) {
     await registerCredentials({
       credentials,
       matcher: 'ubique',
+      debug: __DEV__,
     })
   } catch (error) {
     // Since this is an experimental feature, and it doesn't work if you don't have the latest

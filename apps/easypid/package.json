@@ -17,7 +17,6 @@
 		"@animo-id/eudi-wallet-functionality": "catalog:",
 		"@animo-id/expo-ausweis-sdk": "catalog:",
 		"@animo-id/expo-digital-credentials-api": "catalog:",
-		"@animo-id/expo-mdoc-data-transfer": "catalog:",
 		"@animo-id/expo-secure-environment": "catalog:",
 		"@animo-id/mdoc": "catalog:",
 		"@credo-ts/core": "catalog:",
