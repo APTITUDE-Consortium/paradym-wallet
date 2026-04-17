@@ -16,6 +16,7 @@ export interface FormattedSubmissionEntryNotSatisfied {
 
   name?: string
   description?: string
+  isOptional?: boolean
 
   /**
    * Whether the entry is satisfied
@@ -36,6 +37,7 @@ export interface FormattedSubmissionEntrySatisfied {
 
   name?: string
   description?: string
+  isOptional?: boolean
 
   /**
    * Whether the entry is satisfied
@@ -43,9 +45,15 @@ export interface FormattedSubmissionEntrySatisfied {
   isSatisfied: true
 
   /**
-   * Credentials that match the request entry. Wallet always needs to pick one.
+   * Credentials that match the request entry. Required entries always need a selection.
    */
   credentials: FormattedSubmissionEntrySatisfiedCredential[]
+
+  /**
+   * Whether the end-user should be offered a choice inside this entry.
+   * Some DCQL credential sets are fixed groups and should be shown as a single card.
+   */
+  isSelectable?: boolean
 }
 
 export type FormattedSubmissionEntry = FormattedSubmissionEntryNotSatisfied | FormattedSubmissionEntrySatisfied

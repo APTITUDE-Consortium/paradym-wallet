@@ -1,12 +1,11 @@
 import 'fast-text-encoding'
 
-import { TypedArrayEncoder } from '@credo-ts/core'
+import { credentialDataHandlerOptions } from '@easypid/config/credentialDataHandlerOptions'
 import { allowedRedirectBaseUrls, appScheme } from '@easypid/constants'
 import { deeplinkSchemes } from '@package/app'
 import { LogLevel, ParadymWalletSdkConsoleLogger, parseInvitationUrlSync } from '@paradym/wallet-sdk'
 import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
-import { credentialDataHandlerOptions } from './(app)/_layout'
 
 // NOTE: previously we had this method async, but somehow this prevent the
 // deeplink from working on a cold startup. We updated the invitation handler to
@@ -19,12 +18,11 @@ export function redirectSystemPath({ path, initial }: { path: string; initial: b
   })
 
   const isRecognizedDeeplink = deeplinkSchemes.some((scheme) => path.startsWith(scheme))
-  if (!isRecognizedDeeplink) {
-    logger.debug(
-      'Deeplink is not a recognized deeplink scheme, routing to deeplink directly instead of parsing as invitation.'
-    )
-    return path
-  }
+  const hasEmbeddedOpenIdInvitation =
+    path.includes('request_uri=') ||
+    path.includes('request=') ||
+    path.includes('credential_offer_uri=') ||
+    path.includes('credential_offer=')
 
   try {
     // For the bdr mDL issuer we use authorized code flow, but they also
@@ -32,6 +30,9 @@ export function redirectSystemPath({ path, initial }: { path: string; initial: b
     // back to the easypid wallet.
     const parsedPath = new URL(path)
     const credentialAuthorizationCode = parsedPath.searchParams.get('code')
+    const credentialAuthorizationError = parsedPath.searchParams.get('error')
+    const credentialAuthorizationErrorDescription = parsedPath.searchParams.get('error_description')
+    const credentialAuthorizationState = parsedPath.searchParams.get('state')
 
     const isUniversalRedirect =
       allowedRedirectBaseUrls?.some((redirectBaseUrl) => {
@@ -45,21 +46,31 @@ export function redirectSystemPath({ path, initial }: { path: string; initial: b
 
     const isDeeplinkRedirect = parsedPath.protocol === `${appScheme}:` && parsedPath.pathname === '/wallet/redirect'
 
-    // TODO: we should handle if no `credentialAuthorizationCode` is present
-    // but an `error` and `error_description` and set these so we can show the
-    // error on the authorization screen. Or at least handle the flow correctly
-    // currently it will just redirect as if there's an invitation to be processed.
-    if ((isUniversalRedirect || isDeeplinkRedirect) && credentialAuthorizationCode) {
+    if ((isUniversalRedirect || isDeeplinkRedirect) && (credentialAuthorizationCode || credentialAuthorizationError)) {
       logger.debug(
-        'Link is redirect after authorization code flow. Setting credentialAuthorizationCode search param, but not routing to any screen',
+        'Link is redirect after authorization code flow. Setting authorization result search params, but not routing to any screen',
         {
           credentialAuthorizationCode,
+          credentialAuthorizationError,
+          credentialAuthorizationErrorDescription,
+          credentialAuthorizationState,
         }
       )
-      // We just set the credentialAuthorizationCode, which should be handled by the browser
-      // auth session code in the credential screen that is open.
-      router.setParams({ credentialAuthorizationCode })
+
+      router.setParams({
+        ...(credentialAuthorizationCode ? { credentialAuthorizationCode } : undefined),
+        ...(credentialAuthorizationError ? { credentialAuthorizationError } : undefined),
+        ...(credentialAuthorizationErrorDescription ? { credentialAuthorizationErrorDescription } : undefined),
+        ...(credentialAuthorizationState ? { credentialAuthorizationState } : undefined),
+      })
       return null
+    }
+
+    if (!isRecognizedDeeplink && !hasEmbeddedOpenIdInvitation) {
+      logger.debug(
+        'Deeplink is not a recognized invitation link, routing to deeplink directly instead of parsing as invitation.'
+      )
+      return path
     }
 
     try {
@@ -73,23 +84,16 @@ export function redirectSystemPath({ path, initial }: { path: string; initial: b
       }
 
       if (invitationData.type === 'openid-credential-offer') {
-        redirectPath = `/notifications/openIdCredential?uri=${encodeURIComponent(invitationData.data)}`
+        redirectPath = `/incomingDeeplink?kind=openid-credential-offer&uri=${encodeURIComponent(invitationData.data)}&source=deeplink`
       }
       if (invitationData.type === 'openid-authorization-request') {
-        redirectPath = `/notifications/openIdPresentation?uri=${encodeURIComponent(invitationData.data)}`
+        redirectPath = `/incomingDeeplink?kind=openid-authorization-request&uri=${encodeURIComponent(invitationData.data)}&source=deeplink`
       }
       if (invitationData.type === 'didcomm') {
         redirectPath = `/notifications/didcomm?invitationUrl=${encodeURIComponent(invitationData.data)}`
       }
 
       if (redirectPath) {
-        // Always make the user authenticate first when opening with a deeplink
-        // On initial load this is already the case so we skip it
-        if (!initial) {
-          const encodedRedirect = TypedArrayEncoder.toBase64URL(TypedArrayEncoder.fromString(redirectPath))
-          redirectPath = `/authenticate?redirectAfterUnlock=${encodedRedirect}`
-        }
-
         logger.debug(`Redirecting to path ${redirectPath}`)
         return redirectPath
       }

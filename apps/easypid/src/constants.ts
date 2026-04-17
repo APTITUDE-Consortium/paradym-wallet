@@ -63,6 +63,15 @@ pUGCFdfNLQIgHGSa5u5ZqUtCrnMiaEageO71rjzBlov0YUH4+6ELioY=
     demo: true,
   },
   {
+    entityId: 'eudi-payments.animo.id',
+    name: 'EUDI Payment Demo',
+    certificate:
+      'MIIB9jCCAZygAwIBAgIRAOs+tFLx+a4S71yus5syTAwwCgYIKoZIzj0EAwIwHTEOMAwGA1UEAxMFQW5pbW8xCzAJBgNVBAYTAk5MMB4XDTI1MTIyNzIyMjExOVoXDTI3MDExNjIyMjExOVowITESMBAGA1UEAxMJY3JlZG8gZGNzMQswCQYDVQQGEwJOTDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABF9wQ8H62z+EGJjoTdcQhMU5ySL9x8CSKiZHVAXleVG1FIN8wNZUkC8ecHixGyDnefGb2tpiFvpdyvYXZjaZe8SjgbgwgbUwHQYDVR0OBBYEFIifiPZQ7567GxW8Y9jwzZZ+rWlKMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUBAf8ECzAJBgcogYxdBQECMB8GA1UdIwQYMBaAFMFc4YhCfX8wrZva2QNX/caaP1tuMCkGA1UdEgQiMCCGHmh0dHBzOi8vZXVkaS1wYXltZW50cy5hbmltby5pZDAhBgNVHREEGjAYghZldWRpLXBheW1lbnRzLmFuaW1vLmlkMAoGCCqGSM49BAMCA0gAMEUCIQD/3mKLoollwo64RwvDb+W5d82H/0dMIPMpELl/e4RXvAIgDgMUHko2A2qTJHt/RbhClUJ/yTYjEKQScg1exniMsy0=',
+    logoUri: 'https://eudi-payments.animo.id/assets/verifiers/government.png',
+    url: 'https://eudi-payments.animo.id',
+    demo: true,
+  },
+  {
     entityId: 'verifier.eudiw.dev',
     name: 'EUDI Reference Verifier',
     certificate:

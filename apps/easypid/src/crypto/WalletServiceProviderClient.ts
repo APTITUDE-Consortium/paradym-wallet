@@ -59,6 +59,10 @@ export const setWalletServiceProviderPin = async (pin: Array<number>, validatePi
   __pin = pin
 }
 
+export const setWalletServiceProviderPinFromString = async (pin: string, validatePin = true) => {
+  await setWalletServiceProviderPin(pin.split('').map(Number), validatePin)
+}
+
 export const getWalletServiceProviderPin = () => __pin
 
 const GENERIC_RECORD_WALLET_SERVICE_PROVIDER_SALT_ID = 'GENERIC_RECORD_WALLET_SERVICE_PROVIDER_SALT_ID'

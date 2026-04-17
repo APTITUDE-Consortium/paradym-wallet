@@ -42,9 +42,14 @@ import {
   setBatchCredentialMetadata,
   setOpenId4VcCredentialMetadata,
 } from '../metadata/credentials'
+import { createTimingLogger } from '../logging'
 import { getCredentialBindingResolver } from '../openid4vc/credentialBindingResolver'
 import { getCredentialDisplayForOffer } from '../openid4vc/func/getCredentialDisplayForOffer'
-import { type CredentialsForProofRequest, resolveCredentialRequest } from '../openid4vc/func/resolveCredentialRequest'
+import {
+  type CredentialsForProofRequest,
+  type ResolveCredentialRequestStage,
+  resolveCredentialRequest,
+} from '../openid4vc/func/resolveCredentialRequest'
 import type { ParadymWalletSdk } from '../ParadymWalletSdk'
 
 export type AcceptOutOfBandInvitationResult<FlowType extends 'issue' | 'verify' | 'connect'> = Promise<
@@ -91,7 +96,16 @@ export type ResolveCredentialOfferOptions = {
   offerUri: string
   authorization?: { clientId: string; redirectUri: string }
   fetchAuthorization?: boolean
+  onProgress?: (stage: ResolveCredentialOfferStage) => void
 }
+
+export type ResolveCredentialOfferStage =
+  | 'resolving_offer'
+  | 'resolving_authorization'
+  | 'resolving_presentation_request'
+  | 'verifying_presentation_request'
+  | 'resolving_issuer_trust'
+  | 'matching_wallet_credentials'
 
 // TODO: export from openid4vc
 export type TransactionCodeInfo = {
@@ -153,11 +167,16 @@ export async function resolveCredentialOffer({
   offerUri,
   authorization,
   fetchAuthorization = true,
+  onProgress,
 }: ResolveCredentialOfferOptions): Promise<ResolveCredentialOfferReturn> {
   assertAgentType(paradym.agent, 'openid4vc')
   paradym.logger.info(`Receiving openid uri '${offerUri}'`)
+  const timing = createTimingLogger(paradym.logger, 'openid4vci.resolveOffer')
 
-  const resolvedCredentialOffer = await paradym.agent.openid4vc.holder.resolveCredentialOffer(offerUri)
+  onProgress?.('resolving_offer')
+  const resolvedCredentialOffer = await timing.step('resolveCredentialOffer', async () =>
+    paradym.agent.openid4vc!.holder.resolveCredentialOffer(offerUri)
+  )
   let resolvedAuthorizationRequest: OpenId4VciResolvedAuthorizationRequest | undefined
 
   const preAuthGrant =
@@ -169,6 +188,9 @@ export async function resolveCredentialOffer({
 
   if (preAuthGrant) {
     if (txCodeInfo) {
+      timing.finish({
+        flow: 'pre-auth-with-tx-code',
+      })
       return {
         flow: 'pre-auth-with-tx-code',
         credentialDisplay,
@@ -176,6 +198,9 @@ export async function resolveCredentialOffer({
         txCodeInfo,
       }
     }
+    timing.finish({
+      flow: 'pre-auth',
+    })
     return {
       flow: 'pre-auth',
       credentialDisplay,
@@ -193,19 +218,37 @@ export async function resolveCredentialOffer({
     }
 
     // TODO: authorization should only be initiated after we know which credentials we're going to request
-    resolvedAuthorizationRequest = await paradym.agent.openid4vc.holder.resolveOpenId4VciAuthorizationRequest(
-      resolvedCredentialOffer,
-      {
+    onProgress?.('resolving_authorization')
+    resolvedAuthorizationRequest = await timing.step('resolveAuthorizationRequest', async () =>
+      paradym.agent.openid4vc!.holder.resolveOpenId4VciAuthorizationRequest(resolvedCredentialOffer, {
         redirectUri: authorization.redirectUri,
         clientId: authorization.clientId,
         scope: getScopesFromCredentialConfigurationsSupported(resolvedCredentialOffer.offeredCredentialConfigurations),
-      }
+      })
     )
 
     if (resolvedAuthorizationRequest.authorizationFlow === OpenId4VciAuthorizationFlow.PresentationDuringIssuance) {
+      const mapCredentialRequestStage = (stage: ResolveCredentialRequestStage): ResolveCredentialOfferStage => {
+        switch (stage) {
+          case 'resolving_request':
+            return 'resolving_presentation_request'
+          case 'verifying_request':
+            return 'verifying_presentation_request'
+          case 'resolving_trust':
+            return 'resolving_issuer_trust'
+          case 'matching_credentials':
+            return 'matching_wallet_credentials'
+        }
+      }
+
       const credentialsForProofRequest = await resolveCredentialRequest({
         paradym,
         uri: resolvedAuthorizationRequest.openid4vpRequestUrl,
+        onProgress: (stage) => onProgress?.(mapCredentialRequestStage(stage)),
+      })
+
+      timing.finish({
+        flow: 'auth-presentation-during-issuance',
       })
 
       return {
@@ -217,6 +260,9 @@ export async function resolveCredentialOffer({
       }
     }
 
+    timing.finish({
+      flow: 'auth',
+    })
     return {
       flow: 'auth',
       credentialDisplay,

@@ -31,14 +31,17 @@ export const getTrustedEntitiesForEudiRpAuthentication = async (
   // We can take the first entry as it only allows 1 entry for now
   // This is the certificate of the relying party
   const [entry] = options.authorizationRequestVerificationResult ?? []
+  const registrationCertificate = entry?.x509RegistrationCertificate
 
-  const matchedCert = options.trustMechanismConfiguration.trustedX509Entities.find(
-    (t) => X509Certificate.fromEncodedCertificate(t.certificate).subject === entry.x509RegistrationCertificate.issuer
-  )
+  const matchedCert = registrationCertificate
+    ? options.trustMechanismConfiguration.trustedX509Entities.find(
+        (t) => X509Certificate.fromEncodedCertificate(t.certificate).subject === registrationCertificate.issuer
+      )
+    : undefined
 
-  if (matchedCert) {
-    const dnsName = entry.x509RegistrationCertificate.sanDnsNames[0]
-    const uriName = entry.x509RegistrationCertificate.sanUriNames[0]
+  if (matchedCert && registrationCertificate) {
+    const dnsName = registrationCertificate.sanDnsNames[0]
+    const uriName = registrationCertificate.sanUriNames[0]
 
     organizationName = dnsName
     logoUri = matchedCert.logoUri
@@ -67,9 +70,9 @@ export const getTrustedEntitiesForEudiRpAuthentication = async (
 
   return {
     relyingParty: {
-      organizationName,
-      logoUri,
-      uri,
+      organizationName: relyingParty.organizationName ?? organizationName,
+      logoUri: relyingParty.logoUri ?? logoUri,
+      uri: relyingParty.uri ?? uri,
       entityId: entityId ?? relyingParty.entityId,
     },
     trustedEntities: [...x509TrustedEntities, ...trustedEntities],

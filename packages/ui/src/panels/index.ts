@@ -1,5 +1,6 @@
 export * from './Card'
 export * from './FloatingSheet'
+export * from './FlowSurface'
 export * from './InfoSheet'
 export * from './MessageBox'
 export * from './OptionSheet'

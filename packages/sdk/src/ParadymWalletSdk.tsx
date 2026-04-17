@@ -25,6 +25,7 @@ import {
   resolveOutOfBandInvitation,
 } from './invitation/resolver'
 import type { ParadymWalletSdkLogger } from './logging'
+import { createTimingLogger, ParadymWalletSdkConsoleLogger } from './logging'
 import { type AcquireCredentialsOptions, acquireCredentials } from './openid4vc/func/acquireCredentials'
 import {
   type CompleteCredentialRetrievalOptions,
@@ -42,6 +43,10 @@ import {
   type ResolveCredentialRequestOptions,
   resolveCredentialRequest,
 } from './openid4vc/func/resolveCredentialRequest'
+import {
+  type SendAuthorizationErrorResponseOptions,
+  sendAuthorizationErrorResponse,
+} from './openid4vc/func/sendAuthorizationErrorResponse'
 import { type ShareCredentialsOptions, shareCredentials } from './openid4vc/func/shareCredentials'
 import { RecordProvider } from './providers/AgentProvider'
 import {
@@ -234,6 +239,9 @@ export class ParadymWalletSdk<T extends AgentType = AgentType> {
       declineCredentialRequest: (options: Omit<DeclineCredentialRequestOptions, 'paradym'>) =>
         declineCredentialRequest({ ...options, paradym: this }),
 
+      sendAuthorizationErrorResponse: (options: Omit<SendAuthorizationErrorResponseOptions, 'paradym'>) =>
+        sendAuthorizationErrorResponse({ ...options, paradym: this }),
+
       shareCredentials: (options: Omit<ShareCredentialsOptions, 'paradym'>) =>
         shareCredentials({ ...options, paradym: this }),
     }
@@ -278,6 +286,22 @@ function useSecureUnlockState(configuration: SetupParadymWalletSdkOptions): Secu
   const [isUnlocking, setIsUnlocking] = useState(false)
   const [paradym, setParadym] = useState<ParadymWalletSdk>()
   const [walletKey, setWalletKey] = useState<string>()
+  const [unlockLogger] = useState<ParadymWalletSdkLogger>(() =>
+    configuration.logging?.customLogger
+      ? new configuration.logging.customLogger(configuration.logging.level)
+      : new ParadymWalletSdkConsoleLogger(configuration.logging?.level)
+  )
+
+  const enableBiometricUnlock = async () => {
+    if (!walletKey) {
+      throw new Error('Missing walletKey')
+    }
+
+    const walletKeyVersion = secureWalletKey.getWalletKeyVersion()
+    await secureWalletKey.storeWalletKey(walletKey, walletKeyVersion)
+    await secureWalletKey.getWalletKeyUsingBiometrics(walletKeyVersion)
+    setIsBiometricsEnabled(true)
+  }
 
   useQuery({
     queryFn: async () => {
@@ -330,9 +354,11 @@ function useSecureUnlockState(configuration: SetupParadymWalletSdkOptions): Secu
     return {
       state,
       unlockMethod,
+      isUnlocking,
       reinitialize,
       reset,
-      unlock: async (_options) => {
+      unlock: async (options) => {
+        const timing = createTimingLogger(unlockLogger, 'wallet.unlock')
         try {
           const walletKeyVersion = secureWalletKey.getWalletKeyVersion()
           const id = configuration.id ? `${configuration.id}-${walletKeyVersion}` : `paradym-wallet-${walletKeyVersion}`
@@ -343,9 +369,20 @@ function useSecureUnlockState(configuration: SetupParadymWalletSdkOptions): Secu
             id,
             key,
           })
-          await pws.agent.initialize()
+          await timing.step('initializeAgent', async () => {
+            await pws.agent.initialize()
+          })
+          if (options?.enableBiometrics) {
+            await timing.step('enableBiometrics', enableBiometricUnlock)
+          }
+
           setState('unlocked')
           setParadym(pws)
+          timing.finish({
+            method: unlockMethod,
+            enableBiometrics: Boolean(options?.enableBiometrics),
+          })
+
           return pws
         } catch (error) {
           if (error instanceof CredoError && error.cause instanceof AskarStoreInvalidKeyError) {
@@ -360,6 +397,8 @@ function useSecureUnlockState(configuration: SetupParadymWalletSdkOptions): Secu
             throw new ParadymWalletAuthenticationInvalidPinError()
           }
           throw error
+        } finally {
+          setIsUnlocking(false)
         }
       },
     }
@@ -381,12 +420,18 @@ function useSecureUnlockState(configuration: SetupParadymWalletSdkOptions): Secu
 
         setIsUnlocking(true)
         setBiometricsUnlockAttempts((attempts) => attempts + 1)
+        const timing = createTimingLogger(unlockLogger, 'wallet.unlock.biometric')
         try {
-          const walletKey = await secureWalletKey.getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
+          const walletKey = await timing.step('retrieveWalletKey', async () =>
+            secureWalletKey.getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
+          )
           if (walletKey) {
             setWalletKey(walletKey)
             setUnlockMethod('biometrics')
             setState('acquired-wallet-key')
+            timing.finish()
+          } else {
+            setIsUnlocking(false)
           }
         } catch (error) {
           // If use cancelled we won't allow trying using biometrics again
@@ -397,20 +442,24 @@ function useSecureUnlockState(configuration: SetupParadymWalletSdkOptions): Secu
           else if (biometricsUnlockAttempts > 3) {
             setCanTryUnlockingUsingBiometrics(false)
           }
-        } finally {
           setIsUnlocking(false)
         }
       },
       unlockUsingPin: async (pin: string) => {
         setIsUnlocking(true)
+        const timing = createTimingLogger(unlockLogger, 'wallet.unlock.pin')
         try {
-          const walletKey = await secureWalletKey.getWalletKeyUsingPin(pin, secureWalletKey.getWalletKeyVersion())
+          const walletKey = await timing.step('retrieveWalletKey', async () =>
+            secureWalletKey.getWalletKeyUsingPin(pin, secureWalletKey.getWalletKeyVersion())
+          )
 
           setWalletKey(walletKey)
           setUnlockMethod('pin')
           setState('acquired-wallet-key')
-        } finally {
+          timing.finish()
+        } catch (error) {
           setIsUnlocking(false)
+          throw error
         }
       },
     }
@@ -429,11 +478,7 @@ function useSecureUnlockState(configuration: SetupParadymWalletSdkOptions): Secu
         await paradym.reset()
         reinitialize()
       },
-      enableBiometricUnlock: async () => {
-        await secureWalletKey.storeWalletKey(walletKey, secureWalletKey.getWalletKeyVersion())
-        await secureWalletKey.getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
-        setIsBiometricsEnabled(true)
-      },
+      enableBiometricUnlock,
       disableBiometricUnlock: async () => {
         await secureWalletKey.removeWalletKey(secureWalletKey.getWalletKeyVersion())
         setIsBiometricsEnabled(false)
@@ -482,6 +527,7 @@ export type SecureUnlockReturnNotConfigured = {
 export type SecureUnlockReturnWalletKeyAcquired = {
   state: 'acquired-wallet-key'
   unlockMethod: UnlockMethod
+  isUnlocking: boolean
   unlock: (options?: UnlockOptions) => Promise<ParadymWalletSdk>
   reset: () => Promise<void>
   reinitialize: () => void

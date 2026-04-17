@@ -1,4 +1,4 @@
-import { setWalletServiceProviderPin } from '@easypid/crypto/WalletServiceProviderClient'
+import { setWalletServiceProviderPinFromString } from '@easypid/crypto/WalletServiceProviderClient'
 import { useDevelopmentMode } from '@easypid/hooks'
 import { useShouldUsePinForSubmission } from '@easypid/hooks/useShouldUsePinForPresentation'
 import { useLingui } from '@lingui/react/macro'
@@ -78,7 +78,7 @@ export function FunkeMdocOfflineSharingScreen({
       setIsProcessing(true)
 
       try {
-        await setWalletServiceProviderPin(pin.split('').map(Number))
+        await setWalletServiceProviderPinFromString(pin)
       } catch (e) {
         setIsProcessing(false)
         if (e instanceof ParadymWalletAuthenticationInvalidPinError) {

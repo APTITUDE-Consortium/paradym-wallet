@@ -2,6 +2,7 @@ import { PinPad, PinValues, XStack, YStack } from '@package/ui'
 import { type ForwardedRef, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import Animated, {
   Easing,
+  type SharedValue,
   useSharedValue,
   withDelay,
   withRepeat,
@@ -18,6 +19,7 @@ interface PinDotsInputProps {
   useNativeKeyboard?: boolean
   onBiometricsTap?: () => void
   biometricsType?: 'face' | 'fingerprint'
+  pinPadHorizontalBleed?: number
 }
 
 export interface PinDotsInputRef {
@@ -25,6 +27,72 @@ export interface PinDotsInputRef {
   focus: () => void
   clear: () => void
   shake: () => void
+}
+
+function usePinDotTranslations(dotCount: number, isInLoadingState: boolean) {
+  const translationAnimations = new Array(dotCount).fill(0).map(() => useSharedValue(0))
+
+  useEffect(() => {
+    translationAnimations.forEach((animation, index) => {
+      if (!isInLoadingState) {
+        animation.value = withTiming(0, { duration: 75 })
+        return
+      }
+
+      const delay = index * (500 / translationAnimations.length)
+      animation.value = withDelay(
+        delay,
+        withRepeat(
+          withSequence(
+            withTiming(-10, { duration: 400 / 2, easing: Easing.bezier(0.42, 0, 0.58, 1) }),
+            withTiming(0, { duration: 400 / 2, easing: Easing.bezier(0.42, 0, 0.58, 1) }),
+            withDelay(500, withTiming(0, { duration: 0 }))
+          ),
+          -1,
+          false
+        )
+      )
+    })
+  }, [isInLoadingState, translationAnimations])
+
+  return translationAnimations
+}
+
+function PinDotsRow({
+  pinDots,
+  isInLoadingState,
+  shakeAnimation,
+}: {
+  pinDots: boolean[]
+  isInLoadingState: boolean
+  shakeAnimation?: SharedValue<number>
+}) {
+  const translationAnimations = usePinDotTranslations(pinDots.length, isInLoadingState)
+
+  return (
+    <Animated.View style={shakeAnimation ? { left: shakeAnimation } : undefined}>
+      <XStack justifyContent="center" gap="$2">
+        {pinDots.map((filled, i) => (
+          <Animated.View key={i} style={{ transform: [{ translateY: translationAnimations[i] }] }}>
+            <Circle
+              size="$1.5"
+              backgroundColor={filled ? '$primary-500' : '$background'}
+              borderColor="$primary-500"
+              borderWidth="$1"
+            />
+          </Animated.View>
+        ))}
+      </XStack>
+    </Animated.View>
+  )
+}
+
+export function PinDotsIndicator({ dotCount = 6 }: { dotCount?: number }) {
+  return (
+    <YStack pt="$3" pb="$1">
+      <PinDotsRow pinDots={new Array(dotCount).fill(true)} isInLoadingState />
+    </YStack>
+  )
 }
 
 export const PinDotsInput = forwardRef(
@@ -36,6 +104,7 @@ export const PinDotsInput = forwardRef(
       useNativeKeyboard = true,
       onBiometricsTap,
       biometricsType,
+      pinPadHorizontalBleed,
     }: PinDotsInputProps,
     ref: ForwardedRef<PinDotsInputRef>
   ) => {
@@ -46,8 +115,6 @@ export const PinDotsInput = forwardRef(
     const isInLoadingState = isLoading
 
     const pinDots = new Array(pinLength).fill(0).map((_, i) => isInLoadingState || pin[i] !== undefined)
-
-    const translationAnimations = pinDots.map(() => useSharedValue(0))
     const shakeAnimation = useSharedValue(0)
 
     // Shake animation
@@ -59,31 +126,6 @@ export const PinDotsInput = forwardRef(
         true
       )
     }, [shakeAnimation, errorHaptic])
-
-    useEffect(() => {
-      translationAnimations.forEach((animation, index) => {
-        // Go back down in 75 milliseconds
-        if (!isInLoadingState) {
-          animation.value = withTiming(0, { duration: 75 })
-          return
-        }
-
-        // Loading animation
-        const delay = index * (500 / translationAnimations.length)
-        animation.value = withDelay(
-          delay,
-          withRepeat(
-            withSequence(
-              withTiming(-10, { duration: 400 / 2, easing: Easing.bezier(0.42, 0, 0.58, 1) }),
-              withTiming(0, { duration: 400 / 2, easing: Easing.bezier(0.42, 0, 0.58, 1) }),
-              withDelay(500, withTiming(0, { duration: 0 }))
-            ),
-            -1,
-            false
-          )
-        )
-      })
-    }, [...translationAnimations, translationAnimations.forEach, translationAnimations.length, isInLoadingState])
 
     useImperativeHandle(
       ref,
@@ -134,22 +176,19 @@ export const PinDotsInput = forwardRef(
     }
 
     return (
-      <YStack flexGrow={1} gap="$8" jc="space-between" onPress={() => inputRef.current?.focus()}>
-        <Animated.View style={{ left: shakeAnimation }}>
-          <XStack justifyContent="center" gap="$2">
-            {pinDots.map((filled, i) => (
-              // NOTE: somehow this gives a warning, but we're not directly accessing the values?!?
-              <Animated.View key={i} style={{ transform: [{ translateY: translationAnimations[i] }] }}>
-                <Circle
-                  size="$1.5"
-                  backgroundColor={filled ? '$primary-500' : '$background'}
-                  borderColor="$primary-500"
-                  borderWidth="$1"
-                />
-              </Animated.View>
-            ))}
-          </XStack>
-        </Animated.View>
+      <YStack
+        width="100%"
+        maxWidth="100%"
+        minWidth={0}
+        flexGrow={1}
+        gap="$8"
+        jc="space-between"
+        overflow="hidden"
+        onPress={() => inputRef.current?.focus()}
+      >
+        <YStack pt="$3" pb="$1">
+          <PinDotsRow pinDots={pinDots} isInLoadingState={Boolean(isInLoadingState)} shakeAnimation={shakeAnimation} />
+        </YStack>
         {useNativeKeyboard ? (
           <Input
             ref={inputRef}
@@ -176,6 +215,7 @@ export const PinDotsInput = forwardRef(
             disabled={isInLoadingState}
             useBiometricsPad={!!onBiometricsTap}
             biometricsType={biometricsType}
+            horizontalBleed={pinPadHorizontalBleed}
           />
         )}
       </YStack>

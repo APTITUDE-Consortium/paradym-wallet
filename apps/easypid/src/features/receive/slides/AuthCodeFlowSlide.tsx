@@ -36,9 +36,12 @@ export const AuthCodeFlowSlide = ({
   const [isDevelopmentModeEnabled] = useDevelopmentMode()
   const { t } = useLingui()
   const { onNext, onCancel: wizardOnCancel } = useWizard()
-  const { credentialAuthorizationCode } = useGlobalSearchParams<{
-    credentialAuthorizationCode?: string
-  }>()
+  const { credentialAuthorizationCode, credentialAuthorizationError, credentialAuthorizationErrorDescription } =
+    useGlobalSearchParams<{
+      credentialAuthorizationCode?: string
+      credentialAuthorizationError?: string
+      credentialAuthorizationErrorDescription?: string
+    }>()
   const [browserResult, setBrowserResult] = useState<WebBrowser.WebBrowserAuthSessionResult>()
   const [hasHandledResult, setHasHandledResult] = useState(false)
 
@@ -59,6 +62,32 @@ export const AuthCodeFlowSlide = ({
       setHasHandledResult(true)
       onNext()
       onAuthFlowCallback(credentialAuthorizationCode)
+    } else if (credentialAuthorizationError) {
+      if (Platform.OS === 'ios') {
+        WebBrowser.dismissAuthSession()
+      }
+
+      setHasHandledResult(true)
+
+      const descriptionSuffix = credentialAuthorizationErrorDescription
+        ? `\n\n${credentialAuthorizationErrorDescription}`
+        : ''
+
+      if (credentialAuthorizationError === 'access_denied') {
+        onCancel(t(commonMessages.authorizationCancelled) + descriptionSuffix)
+        return
+      }
+
+      paradym.logger.warn('Browser authorization failed. Authorization redirect returned an error', {
+        credentialAuthorizationError,
+        credentialAuthorizationErrorDescription,
+      })
+      toast.show(t(commonMessages.authorizationFailed), {
+        customData: {
+          preset: 'warning',
+        },
+      })
+      onError(t(commonMessages.authorizationFailed) + descriptionSuffix)
     } else if (browserResult) {
       if (browserResult.type !== 'success') {
         paradym.logger.warn('Browser authorization failed. Browser result did not return a success status', {
@@ -111,6 +140,8 @@ export const AuthCodeFlowSlide = ({
     browserResult,
     hasHandledResult,
     credentialAuthorizationCode,
+    credentialAuthorizationError,
+    credentialAuthorizationErrorDescription,
     onAuthFlowCallback,
     paradym.logger.warn,
     toast.show,

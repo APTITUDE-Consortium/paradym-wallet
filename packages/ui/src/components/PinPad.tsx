@@ -89,9 +89,16 @@ export interface PinPadProps {
   useBiometricsPad?: boolean
   biometricsType?: 'face' | 'fingerprint'
   disabled?: boolean
+  horizontalBleed?: number
 }
 
-export const PinPad = ({ onPressPinNumber, useBiometricsPad, disabled, biometricsType }: PinPadProps) => {
+export const PinPad = ({
+  onPressPinNumber,
+  useBiometricsPad,
+  disabled,
+  biometricsType,
+  horizontalBleed = 32,
+}: PinPadProps) => {
   const pinValues = [
     [PinValues.One, PinValues.Two, PinValues.Three],
     [PinValues.Four, PinValues.Five, PinValues.Six],
@@ -125,8 +132,7 @@ export const PinPad = ({ onPressPinNumber, useBiometricsPad, disabled, biometric
   ))
 
   return (
-    // This is not a good solution, but it's a quick fix to get the pin pad full screen without changing the whole onboarding layout
-    <YStack mr={-32} ml={-32}>
+    <YStack mr={-horizontalBleed} ml={-horizontalBleed}>
       {pinNumbers}
     </YStack>
   )

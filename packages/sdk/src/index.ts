@@ -4,6 +4,7 @@ export type { CredentialForDisplayId} from './display/credential'
 export type { BaseAgent, DidCommAgent, OpenId4VcAgent } from './agent'
 export { DigitalCredentialsRequest } from './dcApi'
 export { type DcApiRegisterCredentialsOptions} from './dcApi/registerCredentials'
+export { registerCreationOptionsForDcApi } from './dcApi/registerCreationOptions'
 export type { CredentialForDisplay, DisplayImage, CredentialIssuerDisplay, CredentialDisplay } from './display/credential'
 export * from './error'
 export type {
@@ -14,10 +15,17 @@ export type {
 } from './format/submission'
 export { useCredentialByCategory, useDidCommCredentialActions, useParadym,type CredentialId, useCredentialById,useDidCommPresentationActions,useDidCommConnectionActions,useActivities, useInboxNotifications,useHasInboxNotifications, useCredentials, useRefreshedDeferredCredentials } from './hooks'
 export { InvitationQrTypes, type InvitationType } from './invitation/parser'
-export type { ResolveOutOfBandInvitationResult } from './invitation/resolver'
+export type { ResolveCredentialOfferStage, ResolveOutOfBandInvitationResult } from './invitation/resolver'
 export { LogLevel, ParadymWalletSdkConsoleLogger, ParadymWalletSdkLogger } from './logging'
 export type { OpenId4VcCredentialMetadata } from './metadata/credentials'
-export type { CredentialsForProofRequest } from './openid4vc/func/resolveCredentialRequest'
+export type { CredentialsForProofRequest, ResolveCredentialRequestStage } from './openid4vc/func/resolveCredentialRequest'
+export type {
+  OpenId4VpAuthorizationErrorCode,
+  OpenId4VpAuthorizationErrorResponsePayload,
+  OpenId4VpAuthorizationErrorResponseResult,
+  SendAuthorizationErrorResponseOptions,
+} from './openid4vc/func/sendAuthorizationErrorResponse'
+export { sendAuthorizationErrorResponse } from './openid4vc/func/sendAuthorizationErrorResponse'
 export type { FormattedTransactionData, QtspInfo } from './openid4vc/transaction'
 export { ParadymWalletSdk, type SetupParadymWalletSdkOptions } from './ParadymWalletSdk'
 export type {

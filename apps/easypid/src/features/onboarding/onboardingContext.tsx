@@ -1,4 +1,7 @@
-import { setupWalletServiceProvider, setWalletServiceProviderPin } from '@easypid/crypto/WalletServiceProviderClient'
+import {
+  setWalletServiceProviderPinFromString,
+  setupWalletServiceProvider,
+} from '@easypid/crypto/WalletServiceProviderClient'
 import { resetAppState } from '@easypid/utils/resetAppState'
 import type { OnboardingPage, OnboardingStep } from '@easypid/utils/sharedPidSetup'
 import { useLingui } from '@lingui/react/macro'
@@ -127,7 +130,7 @@ export function OnboardingContextProvider({
 
     try {
       await paradym.setPin(walletPin as string)
-      await setWalletServiceProviderPin((walletPin as string).split('').map(Number), false)
+      await setWalletServiceProviderPinFromString(walletPin as string, false)
       goToNextStep()
     } catch (e) {
       reset({ error: e, resetToStep: 'welcome' })
@@ -139,7 +142,12 @@ export function OnboardingContextProvider({
     return Linking.openSettings().then(() => setCurrentStepName('biometrics'))
   }
 
-  const onEnableBiometrics = async () => {
+  const onEnableBiometrics = async (enableBiometrics: boolean) => {
+    if (!enableBiometrics) {
+      await goToNextStep()
+      return
+    }
+
     if (paradym.state !== 'acquired-wallet-key' && paradym.state !== 'unlocked') {
       await reset({
         resetToStep: 'pin',
@@ -151,6 +159,9 @@ export function OnboardingContextProvider({
       if (paradym.state === 'acquired-wallet-key') {
         const sdk = await paradym.unlock({ enableBiometrics: true })
         await setupWalletServiceProvider(sdk, true)
+      } else {
+        await paradym.enableBiometricUnlock()
+        await setupWalletServiceProvider(paradym.paradym, true)
       }
 
       goToNextStep()

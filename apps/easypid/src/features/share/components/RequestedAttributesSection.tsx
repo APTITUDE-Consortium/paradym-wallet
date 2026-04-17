@@ -11,16 +11,30 @@ import {
   getDisclosedAttributeNamesForDisplay,
   getUnsatisfiedAttributePathsForDisplay,
 } from '@paradym/wallet-sdk'
+import type { SelectedCredentialsMap } from './CredentialSelectionSection'
 
 export type RequestedAttributesSectionProps = {
   submission: FormattedSubmission
+  selectedCredentials?: SelectedCredentialsMap
 }
 
-export function RequestedAttributesSection({ submission }: RequestedAttributesSectionProps) {
+export function RequestedAttributesSection({ submission, selectedCredentials = {} }: RequestedAttributesSectionProps) {
   const { t } = useLingui()
 
   const satisfiedEntries = submission.entries.filter((e): e is FormattedSubmissionEntrySatisfied => e.isSatisfied)
-  const unsatisfiedEntries = submission.entries.filter((e): e is FormattedSubmissionEntryNotSatisfied => !e.isSatisfied)
+  const visibleSatisfiedEntries = satisfiedEntries.filter((entry) => {
+    if (!entry.isOptional) return true
+
+    const selectedCredentialId = selectedCredentials[entry.inputDescriptorId]
+    return typeof selectedCredentialId === 'string' && !selectedCredentialId.startsWith('__none__')
+  })
+  const unsatisfiedEntries = submission.entries.filter(
+    (e): e is FormattedSubmissionEntryNotSatisfied => !e.isSatisfied && e.isOptional !== true
+  )
+
+  if (visibleSatisfiedEntries.length === 0 && unsatisfiedEntries.length === 0) {
+    return null
+  }
 
   const requestedCardsHeading = t({
     id: 'requestedAttributes.requestedCardsHeading',
@@ -70,24 +84,27 @@ export function RequestedAttributesSection({ submission }: RequestedAttributesSe
     <YStack gap="$4">
       <YStack gap="$2">
         <Heading heading="sub2">
-          {satisfiedEntries.length > 0 ? requestedCardsHeading : unavailableCardsHeading}
+          {visibleSatisfiedEntries.length > 0 ? requestedCardsHeading : unavailableCardsHeading}
         </Heading>
         <Paragraph>
           {unsatisfiedEntries.length === 0
             ? onlySatisfiedDescription
-            : satisfiedEntries.length === 0
+            : visibleSatisfiedEntries.length === 0
               ? onlyUnsatisfiedDescription
               : partialDescription}
         </Paragraph>
       </YStack>
 
-      {/* We always take the first one for now (no selection) */}
-      {satisfiedEntries.map(({ credentials: [credential], ...entry }) => {
+      {visibleSatisfiedEntries.map((entry) => {
+        const credential =
+          entry.credentials.find((item) => item.credential.id === selectedCredentials[entry.inputDescriptorId]) ??
+          entry.credentials[0]
+
         return (
           <CardWithAttributes
             key={entry.inputDescriptorId}
             id={credential.credential.id}
-            name={credential.credential.display.name ?? t(commonMessages.unknown)}
+            name={entry.name ?? credential.credential.display.name ?? t(commonMessages.unknown)}
             backgroundImage={credential.credential.display.backgroundImage}
             backgroundColor={credential.credential.display.backgroundColor}
             issuerImage={credential.credential.display.issuer.logo}
@@ -110,7 +127,7 @@ export function RequestedAttributesSection({ submission }: RequestedAttributesSe
 
       {unsatisfiedEntries.length > 0 && (
         <>
-          {satisfiedEntries.length !== 0 && (
+          {visibleSatisfiedEntries.length !== 0 && (
             <YStack>
               <Heading heading="sub2">{unavailableCardsHeading}</Heading>
             </YStack>

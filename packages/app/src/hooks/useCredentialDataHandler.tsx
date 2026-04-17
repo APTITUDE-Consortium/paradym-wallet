@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router'
 export interface CredentialDataHandlerOptions {
   allowedInvitationTypes?: Array<InvitationType>
   routeMethod?: 'push' | 'replace'
+  source?: string
 }
 
 export const useCredentialDataHandler = () => {
@@ -40,10 +41,18 @@ export const useCredentialDataHandler = () => {
       if (invitationData.type === 'openid-credential-offer') {
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
         routeMethod({
-          pathname: '/notifications/openIdCredential',
-          params: {
-            uri: encodeURIComponent(invitationData.data),
-          },
+          pathname: options?.source === 'deeplink' ? '/incomingDeeplink' : '/notifications/openIdCredential',
+          params:
+            options?.source === 'deeplink'
+              ? {
+                  kind: 'openid-credential-offer',
+                  source: options.source,
+                  uri: encodeURIComponent(invitationData.data),
+                }
+              : {
+                  uri: encodeURIComponent(invitationData.data),
+                  source: options?.source,
+                },
         })
         return { success: true } as const
       }
@@ -51,10 +60,19 @@ export const useCredentialDataHandler = () => {
       if (invitationData.type === 'openid-authorization-request') {
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
         routeMethod({
-          pathname: '/notifications/openIdPresentation',
-          params: {
-            uri: encodeURIComponent(invitationData.data),
-          },
+          pathname:
+            options?.source === 'deeplink' ? '/incomingDeeplink' : '/notifications/openIdPresentation',
+          params:
+            options?.source === 'deeplink'
+              ? {
+                  kind: 'openid-authorization-request',
+                  source: options.source,
+                  uri: encodeURIComponent(invitationData.data),
+                }
+              : {
+                  uri: encodeURIComponent(invitationData.data),
+                  source: options?.source,
+                },
         })
         return { success: true } as const
       }
@@ -65,6 +83,7 @@ export const useCredentialDataHandler = () => {
           pathname: '/notifications/didcomm',
           params: {
             invitationUrl: encodeURIComponent(invitationData.data),
+            source: options?.source,
           },
         })
         return { success: true } as const

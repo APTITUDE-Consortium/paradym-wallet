@@ -91,6 +91,7 @@ const createBaseConfig = (appSpecific) => {
     plugins: [
       'expo-web-browser',
       'expo-localization',
+      './plugins/withTransparentOverlayBackground.cjs',
       [
         'react-native-edge-to-edge',
         {
