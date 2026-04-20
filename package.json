@@ -42,8 +42,8 @@
   "packageManager": "pnpm@9.14.2+sha256.06e65a4965baff6d6097f9c8f75c35f6d420974dbc03d775009056a69edfd271",
   "version": "1.0.0",
   "dependencies": {
-    "expo": "~54.0.27",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
+    "expo": "catalog:",
+    "react": "catalog:",
+    "react-native": "catalog:"
   }
 }

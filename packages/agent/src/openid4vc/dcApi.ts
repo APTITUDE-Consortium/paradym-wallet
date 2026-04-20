@@ -10,31 +10,14 @@ import type { EitherAgent } from '../agent'
 import { type CredentialsForProofRequest, getCredentialsForProofRequest } from '../invitation'
 import { shareProof } from '../invitation/shareProof'
 
-export async function resolveRequestForDcApi({
-  agent,
-  request,
-}: {
-  agent: EitherAgent
-  request: DigitalCredentialsRequest
-}) {
-  type DigitalCredentialsSelectionCredMetadata = {
-    credential_id?: string
-    dcql_id?: string
-    transaction_data_indices?: number[]
-    [key: string]: unknown
-  }
+function getDcApiRequestContext(request: DigitalCredentialsRequest) {
   type DigitalCredentialsSelection = {
     requestIdx: number
-    creds: Array<{
-      entryId: string
-      matchedClaimPaths?: Array<Array<string | number | null>>
-      metadata?: DigitalCredentialsSelectionCredMetadata
-    }>
   }
   type SelectedEntry = {
-    credentialId?: string
     providerIndex?: number
   }
+
   const dcRequest = request as DigitalCredentialsRequest & {
     selection?: DigitalCredentialsSelection
     selectedEntry?: SelectedEntry
@@ -42,12 +25,6 @@ export async function resolveRequestForDcApi({
   }
   const requestIndex = dcRequest.selection?.requestIdx ?? dcRequest.selectedEntry?.providerIndex ?? 0
   const sourceBundle = (dcRequest.sourceBundle ?? dcRequest) as Record<string, unknown>
-  const origin =
-    typeof request.origin === 'string'
-      ? request.origin
-      : typeof sourceBundle?.['androidx.credentials.provider.extra.CREDENTIAL_REQUEST_ORIGIN'] === 'string'
-        ? (sourceBundle['androidx.credentials.provider.extra.CREDENTIAL_REQUEST_ORIGIN'] as string)
-        : undefined
   const requestPayload = (() => {
     if (dcRequest.request) {
       return typeof dcRequest.request === 'string' ? JSON.parse(dcRequest.request) : dcRequest.request
@@ -79,15 +56,66 @@ export async function resolveRequestForDcApi({
       return undefined
     }
   })()
+
+  const requestEntry =
+    requestPayload && typeof requestPayload === 'object' && 'requests' in requestPayload && Array.isArray(requestPayload.requests)
+      ? requestPayload.requests[requestIndex]
+      : requestPayload && typeof requestPayload === 'object'
+        ? requestPayload.providers?.[requestIndex]
+        : undefined
+
+  return {
+    dcRequest,
+    requestIndex,
+    sourceBundle,
+    requestPayload,
+    requestEntry,
+  }
+}
+
+export async function resolveRequestForDcApi({
+  agent,
+  request,
+}: {
+  agent: EitherAgent
+  request: DigitalCredentialsRequest
+}) {
+  type DigitalCredentialsSelectionCredMetadata = {
+    credential_id?: string
+    dcql_id?: string
+    transaction_data_indices?: number[]
+    [key: string]: unknown
+  }
+  type DigitalCredentialsSelection = {
+    requestIdx: number
+    creds: Array<{
+      entryId: string
+      matchedClaimPaths?: Array<Array<string | number | null>>
+      metadata?: DigitalCredentialsSelectionCredMetadata
+    }>
+  }
+  type SelectedEntry = {
+    credentialId?: string
+    providerIndex?: number
+  }
+  const dcRequest = request as DigitalCredentialsRequest & {
+    selection?: DigitalCredentialsSelection
+    selectedEntry?: SelectedEntry
+    sourceBundle?: unknown
+  }
+  const { requestIndex, sourceBundle, requestPayload, requestEntry } = getDcApiRequestContext(dcRequest)
+  const origin =
+    typeof request.origin === 'string'
+      ? request.origin
+      : typeof sourceBundle?.['androidx.credentials.provider.extra.CREDENTIAL_REQUEST_ORIGIN'] === 'string'
+        ? (sourceBundle['androidx.credentials.provider.extra.CREDENTIAL_REQUEST_ORIGIN'] as string)
+        : undefined
   if (!requestPayload || typeof requestPayload !== 'object') {
     throw new Error('Invalid Digital Credentials API request payload')
   }
   agent.config.logger.trace('DC API parsed request payload', dcRequest)
 
-  const providerRequest =
-    'requests' in requestPayload && Array.isArray(requestPayload.requests)
-      ? (requestPayload.requests[requestIndex]?.data ?? requestPayload.requests[requestIndex]?.request)
-      : (requestPayload.providers?.[requestIndex]?.request ?? requestPayload.providers?.[requestIndex]?.data)
+  const providerRequest = requestEntry?.data ?? requestEntry?.request
 
   if (!providerRequest) {
     throw new Error('Missing provider request for Digital Credentials API request')
@@ -263,8 +291,19 @@ export async function sendResponseForDcApi({
     result,
   })
 
+  const { requestEntry } = getDcApiRequestContext(dcRequest)
+  const protocol = requestEntry?.protocol
+  if (typeof protocol !== 'string' || protocol.length === 0) {
+    throw new Error('Missing Digital Credentials API protocol in request')
+  }
+
+  const credentialJson = {
+    protocol,
+    data: result.authorizationResponse,
+  }
+
   sendResponse({
-    response: JSON.stringify(result.authorizationResponse),
+    response: JSON.stringify(credentialJson),
   })
 }
 
