@@ -11,6 +11,7 @@ import {
   AgentProvider,
   activityStorage,
   acquirePreAuthorizedAccessToken,
+  BiometricAuthenticationError,
   BiometricAuthenticationCancelledError,
   deferredCredentialStorage,
   type CredentialsForProofRequest,
@@ -36,19 +37,17 @@ import {
   type W3cCredentialRecord,
   type W3cV2CredentialRecord,
   WalletJsonStoreProvider,
+  BiometricAuthenticationNotEnabledError,
 } from '@package/agent'
 import { shareProof } from '@package/agent/invitation/shareProof'
 import { PinDotsInput, type PinDotsInputRef, Provider, SlideWizard } from '@package/app'
-import { secureWalletKey } from '@package/secure-store/secureUnlock'
+import { secureWalletKey, useBiometricUnlockState } from '@package/secure-store/secureUnlock'
 import { commonMessages } from '@package/translations'
 import { Heading, HeroIcons, IconContainer, Paragraph, Stack, YStack } from '@package/ui'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import tamaguiConfig from '../../../tamagui.config'
-import { setWalletServiceProviderPin } from '../../crypto/WalletServiceProviderClient'
-import { useShouldUsePinForSubmission } from '../../hooks/useShouldUsePinForPresentation'
 import { useStoredLocale } from '../../hooks/useStoredLocale'
-import { type onPinSubmitProps, PinSlide } from '../share/slides/PinSlide'
 import { ShareCredentialsSlide } from '../share/slides/ShareCredentialsSlide'
 import { AuthCodeFlowSlide } from './slides/AuthCodeFlowSlide'
 import { CredentialCardSlide } from './slides/CredentialCardSlide'
@@ -152,7 +151,10 @@ export function DcApiIssuanceScreen({ request }: DcApiIssuanceScreenProps) {
 export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenProps) {
   const [agent, setAgent] = useState<EitherAgent>()
   const [isUnlocking, setIsUnlocking] = useState(false)
+  const [isAllowedToAutoPromptBiometrics, setIsAllowedToAutoPromptBiometrics] = useState(false)
+  const [shouldPromptBiometrics, setShouldPromptBiometrics] = useState(true)
   const pinRef = useRef<PinDotsInputRef>(null)
+  const hasAttemptedAutoBiometricsRef = useRef(false)
   const insets = useSafeAreaInsets()
   const { t } = useLingui()
   const [isDevelopmentModeEnabled] = useDevelopmentMode()
@@ -175,6 +177,13 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
 
   const offerUri = useMemo(() => getCredentialOfferUri(request), [request])
   const requestType = request.type
+  const biometricUnlockState = useBiometricUnlockState()
+  const biometricsType =
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('face') ||
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('optic')
+      ? 'face'
+      : 'fingerprint'
+  const showBiometricUnlockAction = biometricUnlockState.data?.canUnlockNow === true
 
   const hasSentResponse = useRef(false)
   const sendCreateResponseOnce = useCallback(
@@ -201,7 +210,7 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
     }
   }, [agent, offerUri, sendCreateErrorResponseOnce])
 
-  const onUnlock = useCallback(
+  const unlockUsingPin = useCallback(
     async (pin: string) => {
       setIsUnlocking(true)
 
@@ -230,6 +239,62 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
     },
     [sendCreateErrorResponseOnce]
   )
+
+  const unlockUsingBiometrics = useCallback(async () => {
+    setIsUnlocking(true)
+
+    const unlockedAgent = await secureWalletKey
+      .getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
+      .then(async (walletKey) => {
+        if (!walletKey) return undefined
+
+        return initializeAppAgent({
+          walletKey,
+          walletKeyVersion: secureWalletKey.getWalletKeyVersion(),
+        })
+      })
+      .catch((error) => {
+        if (
+          error instanceof BiometricAuthenticationCancelledError ||
+          error instanceof BiometricAuthenticationNotEnabledError ||
+          error instanceof BiometricAuthenticationError
+        ) {
+          return undefined
+        }
+
+        sendCreateErrorResponseOnce('Error initializing wallet')
+        return undefined
+      })
+
+    setIsUnlocking(false)
+    if (!unlockedAgent) return
+    setAgent(unlockedAgent)
+  }, [sendCreateErrorResponseOnce])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsAllowedToAutoPromptBiometrics(true), 500)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (agent) {
+      hasAttemptedAutoBiometricsRef.current = false
+      return
+    }
+
+    if (
+      !showBiometricUnlockAction ||
+      !isAllowedToAutoPromptBiometrics ||
+      !shouldPromptBiometrics ||
+      hasAttemptedAutoBiometricsRef.current
+    ) {
+      return
+    }
+
+    hasAttemptedAutoBiometricsRef.current = true
+    void unlockUsingBiometrics()
+  }, [agent, isAllowedToAutoPromptBiometrics, shouldPromptBiometrics, showBiometricUnlockAction, unlockUsingBiometrics])
 
   const onDecline = useCallback(() => {
     sendCreateErrorResponseOnce(t(commonMessages.informationRequestDeclined))
@@ -265,7 +330,6 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
     [isDevelopmentModeEnabled]
   )
 
-  const shouldUsePinForPresentation = useShouldUsePinForSubmission(credentialsForRequest?.formattedSubmission)
   const preAuthGrant =
     resolvedCredentialOffer?.credentialOfferPayload.grants?.['urn:ietf:params:oauth:grant-type:pre-authorized_code']
   const txCode = preAuthGrant?.tx_code
@@ -482,7 +546,7 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
   )
 
   const onPresentationAccept = useCallback(
-    async ({ pin, onPinComplete, onPinError }: onPinSubmitProps) => {
+    async () => {
       if (
         !credentialsForRequest ||
         !resolvedCredentialOffer ||
@@ -495,26 +559,9 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
 
       setIsSharingPresentation(true)
 
-      if (shouldUsePinForPresentation) {
-        if (!pin) {
-          setErrorReason(t(commonMessages.pinRequiredToAcceptPresentation))
-          return
-        }
-        try {
-          await setWalletServiceProviderPin(pin.split('').map(Number))
-        } catch (error) {
-          if (error instanceof InvalidPinError) {
-            onPinError?.()
-            setIsSharingPresentation(false)
-            return
-          }
-
-          setErrorReasonWithError(t(commonMessages.presentationInformationCouldNotBeExtracted), error)
-          return
-        }
-      }
-
       try {
+        // DC API already performs user confirmation before calling into the wallet.
+        // Avoid a second in-app auth step during presentation during issuance.
         const { presentationDuringIssuanceSession } = await shareProof({
           agent,
           resolvedRequest: credentialsForRequest,
@@ -530,16 +577,11 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
         })
 
         await acquireCredentialsAuth(authorizationCode)
-        onPinComplete?.()
         setIsSharingPresentation(false)
       } catch (error) {
         setIsSharingPresentation(false)
         if (error instanceof BiometricAuthenticationCancelledError) {
           setErrorReason(t(commonMessages.biometricAuthenticationCancelled))
-          return
-        }
-        if (error instanceof InvalidPinError) {
-          onPinError?.()
           return
         }
 
@@ -556,7 +598,6 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
       acquireCredentialsAuth,
       resolvedAuthorizationRequest,
       resolvedCredentialOffer,
-      shouldUsePinForPresentation,
       setErrorReasonWithError,
     ]
   )
@@ -611,11 +652,21 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
 
         <Stack pt="$5">
           <PinDotsInput
-            onPinComplete={onUnlock}
+            onPinComplete={unlockUsingPin}
             isLoading={isUnlocking}
             pinLength={6}
             ref={pinRef}
             useNativeKeyboard={false}
+            onBiometricsTap={
+              showBiometricUnlockAction
+                ? () => {
+                    hasAttemptedAutoBiometricsRef.current = true
+                    setShouldPromptBiometrics(false)
+                    void unlockUsingBiometrics()
+                  }
+                : undefined
+            }
+            biometricsType={biometricsType ?? 'fingerprint'}
           />
         </Stack>
       </YStack>
@@ -692,22 +743,13 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
                   screen: (
                     <ShareCredentialsSlide
                       key="share-credentials"
-                      onAccept={shouldUsePinForPresentation ? undefined : () => onPresentationAccept({})}
+                      onAccept={() => onPresentationAccept()}
                       logo={credentialsForRequest.verifier.logo}
                       submission={credentialsForRequest.formattedSubmission}
                       isAccepting={isSharingPresentation}
                       onDecline={onProofDecline}
                       overAskingResponse={{ validRequest: 'could_not_determine', reason: '' }}
                     />
-                  ),
-                }
-              : undefined,
-            isAuthFlow && shouldUsePinForPresentation
-              ? {
-                  step: 'pin-enter',
-                  progress: 82.5,
-                  screen: (
-                    <PinSlide key="pin-enter" isLoading={isSharingPresentation} onPinSubmit={onPresentationAccept} />
                   ),
                 }
               : undefined,

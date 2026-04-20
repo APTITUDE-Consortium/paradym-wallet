@@ -4,23 +4,25 @@ import { initializeAppAgent } from '@easypid/agent'
 import { useLingui } from '@lingui/react/macro'
 import {
   AgentProvider,
+  BiometricAuthenticationError,
   BiometricAuthenticationCancelledError,
   type CredentialsForProofRequest,
   type EitherAgent,
   type FormattedTransactionData,
+  type QesTransactionDataEntry,
+  type Ts12TransactionDataEntry,
   getFormattedTransactionData,
+  BiometricAuthenticationNotEnabledError,
 } from '@package/agent'
 import { resolveRequestForDcApi, sendErrorResponseForDcApi, sendResponseForDcApi } from '@package/agent/openid4vc/dcApi'
 import { PinDotsInput, type PinDotsInputRef, Provider, type SlideStep, SlideWizard } from '@package/app'
-import { secureWalletKey } from '@package/secure-store/secureUnlock'
+import { secureWalletKey, useBiometricUnlockState } from '@package/secure-store/secureUnlock'
 import { commonMessages } from '@package/translations'
 import { Heading, HeroIcons, IconContainer, Paragraph, Spinner, Stack, YStack } from '@package/ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import tamaguiConfig from '../../../tamagui.config'
 import { InvalidPinError } from '../../crypto/error'
-import { setWalletServiceProviderPin } from '../../crypto/WalletServiceProviderClient'
-import { useShouldUsePinForSubmission } from '../../hooks/useShouldUsePinForPresentation'
 import { useStoredLocale } from '../../hooks/useStoredLocale'
 import { SigningSlide } from './slides/SigningSlide'
 import { getAdditionalPayload } from './slides/Ts12BaseSlide'
@@ -59,15 +61,22 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
   const [selectedTransactionData, setSelectedTransactionData] = useState<TransactionSelection[]>([])
   const [isUnlocking, setIsUnlocking] = useState(false)
   const [isResolving, setIsResolving] = useState(false)
-  const [unlockPin, setUnlockPin] = useState<string>()
+  const [isAllowedToAutoPromptBiometrics, setIsAllowedToAutoPromptBiometrics] = useState(false)
+  const [shouldPromptBiometrics, setShouldPromptBiometrics] = useState(true)
   const pinRef = useRef<PinDotsInputRef>(null)
-  const hasSharedRef = useRef(false)
+  const hasAttemptedAutoBiometricsRef = useRef(false)
   const insets = useSafeAreaInsets()
   const { t } = useLingui()
 
-  const shouldUsePin = useShouldUsePinForSubmission(resolvedRequest?.formattedSubmission)
+  const biometricUnlockState = useBiometricUnlockState()
+  const biometricsType =
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('face') ||
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('optic')
+      ? 'face'
+      : 'fingerprint'
+  const showBiometricUnlockAction = biometricUnlockState.data?.canUnlockNow === true
 
-  const onUnlock = useCallback(
+  const unlockUsingPin = useCallback(
     async (pin: string) => {
       setIsUnlocking(true)
 
@@ -92,11 +101,66 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
 
       setIsUnlocking(false)
       if (!unlockedAgent) return
-      setUnlockPin(pin)
       setAgent(unlockedAgent)
     },
     [setAgent]
   )
+
+  const unlockUsingBiometrics = useCallback(async () => {
+    setIsUnlocking(true)
+
+    const unlockedAgent = await secureWalletKey
+      .getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
+      .then(async (walletKey) => {
+        if (!walletKey) return undefined
+
+        return initializeAppAgent({
+          walletKey,
+          walletKeyVersion: secureWalletKey.getWalletKeyVersion(),
+        })
+      })
+      .catch((error) => {
+        if (
+          error instanceof BiometricAuthenticationCancelledError ||
+          error instanceof BiometricAuthenticationNotEnabledError ||
+          error instanceof BiometricAuthenticationError
+        ) {
+          return undefined
+        }
+
+        sendErrorResponseForDcApi('Error initializing wallet')
+        return undefined
+      })
+
+    setIsUnlocking(false)
+    if (!unlockedAgent) return
+    setAgent(unlockedAgent)
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsAllowedToAutoPromptBiometrics(true), 500)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (agent) {
+      hasAttemptedAutoBiometricsRef.current = false
+      return
+    }
+
+    if (
+      !showBiometricUnlockAction ||
+      !isAllowedToAutoPromptBiometrics ||
+      !shouldPromptBiometrics ||
+      hasAttemptedAutoBiometricsRef.current
+    ) {
+      return
+    }
+
+    hasAttemptedAutoBiometricsRef.current = true
+    void unlockUsingBiometrics()
+  }, [agent, isAllowedToAutoPromptBiometrics, shouldPromptBiometrics, showBiometricUnlockAction, unlockUsingBiometrics])
 
   useEffect(() => {
     if (!agent || resolvedRequest) return
@@ -182,32 +246,9 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
     const selectionCreds = getAptitudeSelection(request)?.creds ?? []
     const hasDcApiSelection = selectionCreds.length > 0
 
-    if (shouldUsePin) {
-      if (!unlockPin) {
-        return
-      }
-
-      try {
-        await setWalletServiceProviderPin(unlockPin.split('').map(Number))
-      } catch (error) {
-        if (error instanceof InvalidPinError) {
-          pinRef.current?.clear()
-          pinRef.current?.shake()
-          setAgent(undefined)
-          setResolvedRequest(undefined)
-          setFormattedTransactionData(undefined)
-          setSelectedTransactionData([])
-          setUnlockPin(undefined)
-          hasSharedRef.current = false
-          return
-        }
-
-        sendErrorResponseForDcApi('PIN authentication failed')
-        return
-      }
-    }
-
     try {
+      // DC API already gates user presence before handing control to the wallet.
+      // Avoid stacking a second in-app auth step here.
       const selectedCredentials: Record<string, string> = {}
       let acceptTransactionData: Array<{ credentialId: string; additionalPayload?: object }> | undefined
 
@@ -304,14 +345,14 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
     request,
     resolvedRequest,
     selectedTransactionData,
-    shouldUsePin,
-    unlockPin,
   ])
 
   const transactionSlides: SlideStep[] = (formattedTransactionData ?? []).flatMap((entry, index) => {
     const progress = ((index + 1) / ((formattedTransactionData?.length ?? 0) + 1)) * 100
 
     if (entry.type === 'qes_authorization') {
+      const qesEntry = entry as QesTransactionDataEntry
+
       return [
         {
           step: `signing-${index}`,
@@ -319,13 +360,13 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
           screen: (
             <SigningSlide
               key={`signing-${index}`}
-              qtsp={entry.qtsp}
-              documentNames={entry.documentNames}
+              qtsp={qesEntry.qtsp}
+              documentNames={qesEntry.documentNames}
               onCredentialSelect={(credentialId) =>
                 onTransactionDataSelect(index, { credentialId, additionalPayload: undefined })
               }
               selectedCredentialId={selectedTransactionData?.[index]?.credentialId}
-              possibleCredentialIds={entry.formattedSubmissions.flatMap((s) =>
+              possibleCredentialIds={qesEntry.formattedSubmissions.flatMap((s) =>
                 s.isSatisfied ? s.credentials.map((c) => c.credential.id) : []
               )}
             />
@@ -336,6 +377,8 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
 
     if (entry.type === 'urn:eudi:sca:payment:1') return []
 
+    const ts12Entry = entry as Ts12TransactionDataEntry
+
     return [
       {
         step: `ts12-${index}`,
@@ -343,7 +386,7 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
         screen: (
           <Ts12TransactionSlide
             key={`ts12-${index}`}
-            entry={entry}
+            entry={ts12Entry}
             onCredentialSelect={(credentialId, additionalPayload) =>
               onTransactionDataSelect(index, { credentialId, additionalPayload })
             }
@@ -354,13 +397,6 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
       },
     ]
   })
-
-  useEffect(() => {
-    if (!agent || !resolvedRequest || hasSharedRef.current) return
-    if (formattedTransactionData && formattedTransactionData.length > 0) return
-    hasSharedRef.current = true
-    void onProofAccept()
-  }, [agent, formattedTransactionData, onProofAccept, resolvedRequest])
 
   const SendingSlide = () => {
     const startedRef = useRef(false)
@@ -405,11 +441,21 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
 
         <Stack pt="$5">
           <PinDotsInput
-            onPinComplete={onUnlock}
+            onPinComplete={unlockUsingPin}
             isLoading={isUnlocking}
             pinLength={6}
             ref={pinRef}
             useNativeKeyboard={false}
+            onBiometricsTap={
+              showBiometricUnlockAction
+                ? () => {
+                    hasAttemptedAutoBiometricsRef.current = true
+                    setShouldPromptBiometrics(false)
+                    void unlockUsingBiometrics()
+                  }
+                : undefined
+            }
+            biometricsType={biometricsType ?? 'fingerprint'}
           />
         </Stack>
       </YStack>
@@ -425,21 +471,6 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
             id: 'loadingRequestSlide.description',
             message: 'Fetching information',
             comment: 'Shown while waiting for data to be received from backend',
-          })}
-        </Paragraph>
-      </YStack>
-    )
-  }
-
-  if (!formattedTransactionData || formattedTransactionData.length === 0) {
-    return (
-      <YStack fg={1} jc="center" ai="center" gap="$4">
-        <Spinner />
-        <Paragraph>
-          {t({
-            id: 'sharing.inProgress',
-            message: 'Sharing information',
-            comment: 'Shown while sharing data for the digital credentials API flow',
           })}
         </Paragraph>
       </YStack>
