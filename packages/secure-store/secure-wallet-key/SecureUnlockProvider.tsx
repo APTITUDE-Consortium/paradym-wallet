@@ -1,7 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createContext, type PropsWithChildren, useContext, useState } from 'react'
-import { BiometricAuthenticationCancelledError, BiometricAuthenticationNotEnabledError } from '../../agent/src'
-import { getIsBiometricsEnabled, secureWalletKey, setIsBiometricsEnabled } from './secureWalletKey'
+import {
+  BiometricAuthenticationCancelledError,
+  BiometricAuthenticationError,
+  BiometricAuthenticationNotEnabledError,
+} from '../../agent/src'
+import { getBiometricUnlockStateQueryKey, secureWalletKey } from './secureWalletKey'
 
 const SecureUnlockContext = createContext<SecureUnlockReturn<Record<string, unknown>>>({
   state: 'initializing',
@@ -72,26 +76,53 @@ export type SecureUnlockReturn<Context extends Record<string, unknown>> =
   | SecureUnlockReturnUnlocked<Context>
 
 function _useSecureUnlockState<Context extends Record<string, unknown>>(): SecureUnlockReturn<Context> {
+  const queryClient = useQueryClient()
   const [state, setState] = useState<SecureUnlockState>('initializing')
   const [walletKey, setWalletKey] = useState<string>()
   const [canTryUnlockingUsingBiometrics, setCanTryUnlockingUsingBiometrics] = useState<boolean>(true)
   const [biometricsUnlockAttempts, setBiometricsUnlockAttempts] = useState(0)
-  const [canUseBiometrics, setCanUseBiometrics] = useState<boolean>()
   const [unlockMethod, setUnlockMethod] = useState<SecureUnlockMethod>()
   const [context, setContext] = useState<Context>()
   const [isUnlocking, setIsUnlocking] = useState(false)
 
+  const syncBiometricUnlockState = async () => {
+    const walletKeyVersion = secureWalletKey.getWalletKeyVersion()
+    const biometricUnlockState = await secureWalletKey.getBiometricUnlockState(walletKeyVersion)
+
+    queryClient.setQueryData(getBiometricUnlockStateQueryKey(walletKeyVersion), biometricUnlockState)
+    setCanTryUnlockingUsingBiometrics(biometricUnlockState.canUnlockNow)
+
+    return biometricUnlockState
+  }
+
+  const enableBiometricUnlock = async (walletKeyToStore: string) => {
+    const walletKeyVersion = secureWalletKey.getWalletKeyVersion()
+
+    try {
+      await secureWalletKey.storeWalletKey(walletKeyToStore, walletKeyVersion)
+      const storedWalletKey = await secureWalletKey.getWalletKeyUsingBiometrics(walletKeyVersion)
+
+      if (!storedWalletKey || storedWalletKey !== walletKeyToStore) {
+        throw new Error('Stored wallet key could not be verified after enabling biometric unlock')
+      }
+    } catch (error) {
+      await secureWalletKey.removeWalletKey(walletKeyVersion).catch(() => undefined)
+      await syncBiometricUnlockState()
+      throw error
+    }
+
+    await syncBiometricUnlockState()
+  }
+
+  const disableBiometricUnlock = async () => {
+    await secureWalletKey.removeWalletKey(secureWalletKey.getWalletKeyVersion())
+    await syncBiometricUnlockState()
+  }
+
   useQuery({
     queryFn: async () => {
       const salt = await secureWalletKey.getSalt(secureWalletKey.getWalletKeyVersion())
-      // TODO: is salt the best way to test this?
-
-      // We have two params. If e.g. unlocking using biometrics failed, we will
-      // set setCanTryUnlockingUsingBiometrics to false, but `setCanUseBiometrics`
-      // will still be true (so we can store it)
-      const canUseBiometrics = await secureWalletKey.canUseBiometryBackedWalletKey()
-      setCanUseBiometrics(canUseBiometrics)
-      setCanTryUnlockingUsingBiometrics(canUseBiometrics)
+      await syncBiometricUnlockState()
 
       setState(salt ? 'locked' : 'not-configured')
       return salt
@@ -105,7 +136,6 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
     setWalletKey(undefined)
     setCanTryUnlockingUsingBiometrics(true)
     setBiometricsUnlockAttempts(0)
-    setCanUseBiometrics(undefined)
     setUnlockMethod(undefined)
     setContext(undefined)
     setIsUnlocking(false)
@@ -124,6 +154,7 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
       setWalletKeyInvalid: () => {
         if (unlockMethod === 'biometrics') {
           setCanTryUnlockingUsingBiometrics(false)
+          void disableBiometricUnlock().catch(() => undefined)
         }
 
         setState('locked')
@@ -131,20 +162,16 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
         setUnlockMethod(undefined)
       },
       setWalletKeyValid: async (context, options) => {
+        if (options?.enableBiometrics === true) {
+          await enableBiometricUnlock(walletKey)
+        } else if (options?.enableBiometrics === false) {
+          await disableBiometricUnlock()
+        } else {
+          await syncBiometricUnlockState()
+        }
+
         setContext(context)
         setState('unlocked')
-
-        const isBiometricsEnabled = options?.enableBiometrics ?? getIsBiometricsEnabled()
-
-        // TODO: need extra option to know whether user wants to use biometrics?
-        // TODO: do we need to check whether already stored?
-        if (canUseBiometrics && isBiometricsEnabled) {
-          await secureWalletKey.storeWalletKey(walletKey, secureWalletKey.getWalletKeyVersion())
-          setIsBiometricsEnabled(true)
-        } else {
-          await secureWalletKey.removeWalletKey(secureWalletKey.getWalletKeyVersion())
-          setIsBiometricsEnabled(false)
-        }
       },
     }
   }
@@ -165,15 +192,8 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
         setUnlockMethod(undefined)
         setContext(undefined)
       },
-      enableBiometricUnlock: async () => {
-        await secureWalletKey.storeWalletKey(walletKey, secureWalletKey.getWalletKeyVersion())
-        await secureWalletKey.getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
-        setIsBiometricsEnabled(true)
-      },
-      disableBiometricUnlock: async () => {
-        await secureWalletKey.removeWalletKey(secureWalletKey.getWalletKeyVersion())
-        setIsBiometricsEnabled(false)
-      },
+      enableBiometricUnlock: async () => enableBiometricUnlock(walletKey),
+      disableBiometricUnlock,
     }
   }
 
@@ -185,7 +205,9 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
       reinitialize,
       tryUnlockingUsingBiometrics: async () => {
         // TODO: need to somehow inform user that the unlocking went wrong
-        if (!canTryUnlockingUsingBiometrics) return null
+        const biometricUnlockState = await syncBiometricUnlockState()
+
+        if (!biometricUnlockState.canUnlockNow) return null
 
         setIsUnlocking(true)
         setBiometricsUnlockAttempts((attempts) => attempts + 1)
@@ -195,6 +217,8 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
             setWalletKey(walletKey)
             setUnlockMethod('biometrics')
             setState('acquired-wallet-key')
+          } else {
+            await disableBiometricUnlock()
           }
 
           return walletKey
@@ -202,10 +226,10 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
           // If use cancelled we won't allow trying using biometrics again
           if (error instanceof BiometricAuthenticationCancelledError) {
             setCanTryUnlockingUsingBiometrics(false)
-          }
-          if (error instanceof BiometricAuthenticationNotEnabledError) {
-            setCanTryUnlockingUsingBiometrics(false)
-            setIsBiometricsEnabled(false)
+          } else if (error instanceof BiometricAuthenticationNotEnabledError) {
+            await disableBiometricUnlock()
+          } else if (error instanceof BiometricAuthenticationError) {
+            await syncBiometricUnlockState()
           }
           // If other error, we will allow up to three attempts
           else if (biometricsUnlockAttempts > 3) {

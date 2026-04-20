@@ -2,7 +2,7 @@ import { Trans, useLingui } from '@lingui/react/macro'
 import { BiometricAuthenticationCancelledError, BiometricAuthenticationNotEnabledError, logger } from '@package/agent'
 import { TextBackButton } from '@package/app'
 import { useScrollViewPosition } from '@package/app/hooks'
-import { useCanUseBiometryBackedWalletKey, useIsBiometricsEnabled } from '@package/secure-store/secureUnlock'
+import { useBiometricUnlockState } from '@package/secure-store/secureUnlock'
 import {
   commonMessages,
   type SupportedLocale,
@@ -28,7 +28,6 @@ import { useState } from 'react'
 import { Share } from 'react-native'
 import { Label } from 'tamagui'
 import { useSecureUnlock } from '../../agent'
-import { useBiometricsType } from '../../hooks/useBiometricsType'
 import { useDevelopmentMode } from '../../hooks/useDevelopmentMode'
 import { useStoredLocale } from '../../hooks/useStoredLocale'
 
@@ -87,7 +86,32 @@ export function FunkeSettingsScreen() {
   const secureUnlock = useSecureUnlock()
   if (secureUnlock.state !== 'unlocked') return
 
-  const [isBiometricsEnabled] = useIsBiometricsEnabled()
+  const biometricUnlockState = useBiometricUnlockState()
+  const isBiometricsConfigured = biometricUnlockState.data?.configured ?? false
+  const isBiometricsCapable = biometricUnlockState.data?.capable ?? false
+  const biometricsType =
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('face') ||
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('optic')
+      ? 'face'
+      : 'fingerprint'
+  const biometricsDescription =
+    biometricUnlockState.data == null
+      ? undefined
+      : !isBiometricsConfigured && !isBiometricsCapable
+        ? t({
+            id: 'settings.biometricsNotSupportedDescription',
+            message: 'Biometric authentication is disabled or not supported on this device.',
+            comment: 'Description that the biometric unlock feature is not supported on this device',
+          })
+        : isBiometricsConfigured && !isBiometricsCapable
+          ? t({
+              id: 'settings.biometricsCurrentlyUnavailableDescription',
+              message:
+                'Biometric unlock is configured for this wallet, but currently unavailable on this device. You can turn it off here and set it up again later.',
+              comment:
+                'Description shown when biometric unlock is configured, but the device can no longer use it right now.',
+            })
+          : undefined
 
   async function enableBiometrics() {
     if (secureUnlock.state !== 'unlocked') return
@@ -145,9 +169,6 @@ export function FunkeSettingsScreen() {
     }
   }
 
-  const canUseBiometryBackedWalletKey = useCanUseBiometryBackedWalletKey()
-  const biometricsType = useBiometricsType()
-
   return (
     <FlexPage gap="$0" paddingHorizontal="$0">
       <HeaderContainer
@@ -173,18 +194,10 @@ export function FunkeSettingsScreen() {
                 comment: 'Label for the toggle to enable biometric unlock',
               })}
               icon={biometricsType === 'face' ? <CustomIcons.FaceId /> : <HeroIcons.FingerPrint />}
-              disabled={canUseBiometryBackedWalletKey === false}
-              description={
-                canUseBiometryBackedWalletKey === false
-                  ? t({
-                      id: 'settings.biometricsNotSupportedDescription',
-                      message: 'Biometric authentication is disabled or not supported on this device.',
-                      comment: 'Description that the biometric unlock feature is not supported on this device',
-                    })
-                  : undefined
-              }
-              value={isBiometricsEnabled}
-              onChange={isBiometricsEnabled ? disableBiometrics : enableBiometrics}
+              disabled={biometricUnlockState.data == null || (!isBiometricsConfigured && !isBiometricsCapable)}
+              description={biometricsDescription}
+              value={isBiometricsConfigured}
+              onChange={isBiometricsConfigured ? disableBiometrics : enableBiometrics}
             />
             <Switch
               id="development-mode"

@@ -138,13 +138,6 @@ export function OnboardingContextProvider({
     goToNextStep()
   }
 
-  // Bit sad but if we try to call this in the initializeAgent callback sometimes the state hasn't updated
-  // in the secure unlock yet, which means that it will throw an error, so we use an effect. Probably need
-  // to do a refactor on this and move more logic outside of the react world, as it's a bit weird with state
-  useEffect(() => {
-    if (secureUnlock.state !== 'acquired-wallet-key' || !agent) return
-  }, [secureUnlock, agent])
-
   const initializeAgent = useCallback(async (walletKey: string) => {
     const agent = await initializeAppAgent({
       walletKey,
@@ -186,37 +179,35 @@ export function OnboardingContextProvider({
       return
     }
 
-    return secureUnlock
-      .setup(walletPin as string)
-      .then(async ({ walletKey }) => {
-        await setWalletServiceProviderPin((walletPin as string).split('').map(Number), false)
+    try {
+      const { walletKey } = await secureUnlock.setup(walletPin as string)
+      await setWalletServiceProviderPin((walletPin as string).split('').map(Number), false)
 
-        if (isParadymWallet()) {
-          const legacyWalletKey = await getLegacySecureWalletKey().catch(() => null)
+      if (isParadymWallet()) {
+        const legacyWalletKey = await getLegacySecureWalletKey().catch(() => null)
 
-          if (legacyWalletKey) {
-            await migrateLegacyParadymWallet({
-              legacyWalletKey,
-              newWalletKey: walletKey,
-              walletKeyVersion: secureWalletKey.getWalletKeyVersion(),
+        if (legacyWalletKey) {
+          await migrateLegacyParadymWallet({
+            legacyWalletKey,
+            newWalletKey: walletKey,
+            walletKeyVersion: secureWalletKey.getWalletKeyVersion(),
+          })
+            .catch((e) => {
+              // We ignore this, it's unfortunate but the wallet migration failed
+              console.error('error migrating wallet', e)
             })
-              .catch((e) => {
-                // We ignore this, it's unfortunate but the wallet migration failed
-                console.error('error migrating wallet', e)
-              })
-              .finally(async () => {
-                await removeLegacySecureWalletKey()
-              })
-          }
+            .finally(async () => {
+              await removeLegacySecureWalletKey()
+            })
         }
+      }
 
-        await initializeAgent(walletKey)
-      })
-      .then(goToNextStep)
-      .catch((e) => {
-        reset({ error: e, resetToStep: 'welcome' })
-        throw e
-      })
+      await initializeAgent(walletKey)
+      await goToNextStep()
+    } catch (e) {
+      reset({ error: e, resetToStep: 'welcome' })
+      throw e
+    }
   }
 
   const onEnableBiometricsDisabled = async () => {
@@ -231,34 +222,29 @@ export function OnboardingContextProvider({
       return
     }
 
+    if (!enableBiometrics) {
+      if (secureUnlock.state === 'acquired-wallet-key') {
+        await secureUnlock.setWalletKeyValid({ agent }, { enableBiometrics: false })
+      }
+
+      await goToNextStep()
+      return
+    }
+
     try {
       if (secureUnlock.state === 'acquired-wallet-key') {
         await secureUnlock.setWalletKeyValid({ agent }, { enableBiometrics })
-      }
+      } else {
+        const biometricUnlockState = await secureWalletKey.getBiometricUnlockState(
+          secureWalletKey.getWalletKeyVersion()
+        )
 
-      // Directly try getting the wallet key so the user can enable biometrics
-      // and we can check if biometrics works
-      const walletKey = enableBiometrics
-        ? await secureWalletKey.getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
-        : undefined
-
-      if (!walletKey) {
-        const walletKey =
-          secureUnlock.state === 'acquired-wallet-key'
-            ? secureUnlock.walletKey
-            : secureUnlock.context.agent.modules.askar.config.store.key
-        if (!walletKey) {
-          await reset({ resetToStep: 'pin' })
-          return
-        }
-
-        if (enableBiometrics) {
-          await secureWalletKey.storeWalletKey(walletKey, secureWalletKey.getWalletKeyVersion())
-          await secureWalletKey.getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
+        if (!biometricUnlockState.configured) {
+          await secureUnlock.enableBiometricUnlock()
         }
       }
 
-      goToNextStep()
+      await goToNextStep()
     } catch (error) {
       // We can recover from this, and will show an error on the screen
       if (error instanceof BiometricAuthenticationCancelledError) {
@@ -273,9 +259,10 @@ export function OnboardingContextProvider({
         throw error
       }
 
-      await reset({
-        resetToStep: 'pin',
-        error,
+      toast.show(t(commonMessages.errorChangingBiometrics), {
+        customData: {
+          preset: 'danger',
+        },
       })
       throw error
     }

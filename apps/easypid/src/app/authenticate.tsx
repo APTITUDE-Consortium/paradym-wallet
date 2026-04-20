@@ -1,13 +1,8 @@
 import { TypedArrayEncoder } from '@credo-ts/core'
 import { initializeAppAgent, useSecureUnlock } from '@easypid/agent'
-import { useBiometricsType } from '@easypid/hooks/useBiometricsType'
 import { useLingui } from '@lingui/react/macro'
 import { PinDotsInput, type PinDotsInputRef } from '@package/app'
-import {
-  secureWalletKey,
-  useCanUseBiometryBackedWalletKey,
-  useIsBiometricsEnabled,
-} from '@package/secure-store/secureUnlock'
+import { secureWalletKey, useBiometricUnlockState } from '@package/secure-store/secureUnlock'
 import { commonMessages } from '@package/translations'
 import { FlexPage, Heading, HeroIcons, IconContainer, useDeviceMedia, useToastController, YStack } from '@package/ui'
 import { Redirect, useLocalSearchParams } from 'expo-router'
@@ -25,17 +20,32 @@ export default function Authenticate() {
   const { redirectAfterUnlock } = useLocalSearchParams<{ redirectAfterUnlock?: string }>()
   const toast = useToastController()
   const secureUnlock = useSecureUnlock()
-  const biometricsType = useBiometricsType()
   const pinInputRef = useRef<PinDotsInputRef>(null)
+  const hasAttemptedAutoBiometricsRef = useRef(false)
   const { additionalPadding, noBottomSafeArea } = useDeviceMedia()
   const [isInitializingAgent, setIsInitializingAgent] = useState(false)
   const [isAllowedToUnlockWithFaceId, setIsAllowedToUnlockWithFaceId] = useState(false)
+  const [shouldPromptBiometrics, setShouldPromptBiometrics] = useState(true)
   const { t } = useLingui()
-  const [isBiometricsEnabled] = useIsBiometricsEnabled()
-  const canUseBiometryBackedWalletKey = useCanUseBiometryBackedWalletKey()
+  const biometricUnlockState = useBiometricUnlockState()
+  const biometricsType =
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('face') ||
+    biometricUnlockState.data?.biometryType?.toLowerCase().includes('optic')
+      ? 'face'
+      : 'fingerprint'
+  const showBiometricUnlockAction =
+    biometricUnlockState.data?.canUnlockNow === true &&
+    (secureUnlock.state === 'locked' ||
+      (secureUnlock.state === 'acquired-wallet-key' && secureUnlock.unlockMethod === 'biometrics'))
+  const canAutoPromptBiometricUnlock =
+    biometricUnlockState.data?.canUnlockNow === true &&
+    secureUnlock.state === 'locked' &&
+    secureUnlock.canTryUnlockingUsingBiometrics
 
   const isLoading =
-    secureUnlock.state === 'acquired-wallet-key' || (secureUnlock.state === 'locked' && secureUnlock.isUnlocking)
+    secureUnlock.state === 'acquired-wallet-key' ||
+    (secureUnlock.state === 'locked' && secureUnlock.isUnlocking) ||
+    isInitializingAgent
 
   useEffect(() => {
     if (secureUnlock.state === 'unlocked' && redirectAfterUnlock) {
@@ -52,10 +62,29 @@ export default function Authenticate() {
   }, [])
 
   useEffect(() => {
-    if (secureUnlock.state === 'locked' && secureUnlock.canTryUnlockingUsingBiometrics && isAllowedToUnlockWithFaceId) {
-      secureUnlock.tryUnlockingUsingBiometrics()
+    if (secureUnlock.state !== 'locked') {
+      hasAttemptedAutoBiometricsRef.current = false
+      return
     }
-  }, [secureUnlock.state, isAllowedToUnlockWithFaceId])
+
+    if (
+      !canAutoPromptBiometricUnlock ||
+      !isAllowedToUnlockWithFaceId ||
+      !shouldPromptBiometrics ||
+      hasAttemptedAutoBiometricsRef.current
+    ) {
+      return
+    }
+
+    hasAttemptedAutoBiometricsRef.current = true
+    void secureUnlock.tryUnlockingUsingBiometrics()
+  }, [
+    canAutoPromptBiometricUnlock,
+    isAllowedToUnlockWithFaceId,
+    secureUnlock,
+    secureUnlock.state,
+    shouldPromptBiometrics,
+  ])
 
   useEffect(() => {
     if (secureUnlock.state !== 'acquired-wallet-key') return
@@ -72,6 +101,7 @@ export default function Authenticate() {
           secureUnlock.setWalletKeyInvalid()
           pinInputRef.current?.clear()
           pinInputRef.current?.shake()
+          setShouldPromptBiometrics(false)
         }
 
         // TODO: handle other
@@ -99,7 +129,9 @@ export default function Authenticate() {
 
   const unlockUsingBiometrics = async () => {
     if (secureUnlock.state === 'locked') {
-      secureUnlock.tryUnlockingUsingBiometrics()
+      hasAttemptedAutoBiometricsRef.current = true
+      setShouldPromptBiometrics(false)
+      await secureUnlock.tryUnlockingUsingBiometrics()
     } else {
       toast.show(t({ id: 'authenticate.pinRequiredToast', message: 'Your PIN is required to unlock the app' }), {
         customData: {
@@ -128,7 +160,7 @@ export default function Authenticate() {
           ref={pinInputRef}
           pinLength={6}
           onPinComplete={unlockUsingPin}
-          onBiometricsTap={isBiometricsEnabled && canUseBiometryBackedWalletKey ? unlockUsingBiometrics : undefined}
+          onBiometricsTap={showBiometricUnlockAction ? unlockUsingBiometrics : undefined}
           useNativeKeyboard={false}
           biometricsType={biometricsType ?? 'fingerprint'}
         />
