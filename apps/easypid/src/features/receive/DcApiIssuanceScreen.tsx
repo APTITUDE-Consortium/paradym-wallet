@@ -1,6 +1,7 @@
 import type { DigitalCredentialsCreateRequest } from '@animo-id/expo-digital-credentials-api'
 import { sendCreateErrorResponse, sendCreateResponse } from '@animo-id/expo-digital-credentials-api'
 import { initializeAppAgent } from '@easypid/agent'
+import { WalletPinPromptHeader, WalletPinPromptInput } from '@easypid/components/WalletPinPrompt'
 import { walletClient } from '@easypid/constants'
 import { InvalidPinError } from '@easypid/crypto/error'
 import { useDevelopmentMode } from '@easypid/hooks'
@@ -40,13 +41,14 @@ import {
   BiometricAuthenticationNotEnabledError,
 } from '@package/agent'
 import { shareProof } from '@package/agent/invitation/shareProof'
-import { PinDotsInput, type PinDotsInputRef, Provider, SlideWizard } from '@package/app'
+import { type PinDotsInputRef, Provider, SlideWizard } from '@package/app'
 import { secureWalletKey, useBiometricUnlockState } from '@package/secure-store/secureUnlock'
 import { commonMessages } from '@package/translations'
-import { Heading, HeroIcons, IconContainer, Paragraph, Stack, YStack } from '@package/ui'
+import { HeroIcons, IconContainer, Stack, YStack } from '@package/ui'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import tamaguiConfig from '../../../tamagui.config'
+import { storeWalletPinForBiometricsIfAvailable } from '../../crypto/biometricWalletPin'
 import { useStoredLocale } from '../../hooks/useStoredLocale'
 import { ShareCredentialsSlide } from '../share/slides/ShareCredentialsSlide'
 import { AuthCodeFlowSlide } from './slides/AuthCodeFlowSlide'
@@ -235,6 +237,7 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
 
       setIsUnlocking(false)
       if (!unlockedAgent) return
+      await storeWalletPinForBiometricsIfAvailable(pin)
       setAgent(unlockedAgent)
     },
     [sendCreateErrorResponseOnce]
@@ -643,20 +646,18 @@ export function DcApiIssuanceScreenWithContext({ request }: DcApiIssuanceScreenP
         paddingBottom={insets.bottom ?? '$6'}
       >
         <YStack>
-          <Stack flexDirection="row" jc="space-between" ai="center">
-            <Heading>{t(commonMessages.enterPin)}</Heading>
-            <IconContainer aria-label="Cancel" icon={<HeroIcons.X />} onPress={onDecline} />
-          </Stack>
-          {request.origin ? <Paragraph variant="annotation">{request.origin}</Paragraph> : null}
+          <WalletPinPromptHeader
+            title={t(commonMessages.enterPin)}
+            annotation={request.origin}
+            headerAction={<IconContainer aria-label="Cancel" icon={<HeroIcons.X />} onPress={onDecline} />}
+          />
         </YStack>
 
         <Stack pt="$5">
-          <PinDotsInput
+          <WalletPinPromptInput
             onPinComplete={unlockUsingPin}
             isLoading={isUnlocking}
-            pinLength={6}
-            ref={pinRef}
-            useNativeKeyboard={false}
+            inputRef={pinRef}
             onBiometricsTap={
               showBiometricUnlockAction
                 ? () => {

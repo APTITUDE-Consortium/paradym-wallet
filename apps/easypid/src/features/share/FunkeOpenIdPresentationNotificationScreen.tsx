@@ -18,13 +18,15 @@ import { commonMessages } from '@package/translations'
 import { useToastController } from '@package/ui'
 import { useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
+import { BackHandler, Platform } from 'react-native'
 import { trustedX509Entities } from '../../constants'
 import { setWalletServiceProviderPin } from '../../crypto/WalletServiceProviderClient'
 import { useShouldUsePinForSubmission } from '../../hooks/useShouldUsePinForPresentation'
+import { getShouldUseCloudHsm } from '../onboarding/useShouldUseCloudHsm'
 import { FunkePresentationNotificationScreen } from './FunkePresentationNotificationScreen'
 import type { onPinSubmitProps } from './slides/PinSlide'
 
-type Query = { uri: string }
+type Query = { uri: string; openedFromDeeplink?: string }
 
 export function FunkeOpenIdPresentationNotificationScreen() {
   const { t } = useLingui()
@@ -45,12 +47,34 @@ export function FunkeOpenIdPresentationNotificationScreen() {
   >([])
   const [isSharing, setIsSharing] = useState(false)
   const shouldUsePin = useShouldUsePinForSubmission(credentialsForRequest?.formattedSubmission)
+  const openedFromDeeplink = params.openedFromDeeplink === 'true'
 
   const handleError = useCallback(({ reason, description }: { reason: string; description?: string }) => {
     setIsSharing(false)
     setErrorReason(description ? `${reason}\n${description}` : reason)
     return
   }, [])
+
+  const closeOrReturnToWallet = useCallback(() => {
+    if (openedFromDeeplink && Platform.OS === 'android') {
+      BackHandler.exitApp()
+      return
+    }
+
+    pushToWallet()
+  }, [openedFromDeeplink, pushToWallet])
+
+  const completeProofFlow = useCallback(
+    (onPinComplete?: () => void) => {
+      if (openedFromDeeplink) {
+        closeOrReturnToWallet()
+        return
+      }
+
+      onPinComplete?.()
+    },
+    [closeOrReturnToWallet, openedFromDeeplink]
+  )
 
   const reasonNoCredentials = t({
     id: 'presentation.noCredentialsSelected',
@@ -144,37 +168,42 @@ export function FunkeOpenIdPresentationNotificationScreen() {
   }, [credentialsForRequest, checkForOverAsking, isProcessingOverAsking, overAskingResponse])
 
   const onProofAccept = useCallback(
-    async ({ pin, onPinComplete, onPinError }: onPinSubmitProps = {}) => {
+    async ({ pin, authMethod, onPinComplete, onPinError }: onPinSubmitProps = {}) => {
       stopOverAsking()
       if (!credentialsForRequest) return handleError({ reason: reasonNoCredentials })
 
       setIsSharing(true)
 
       if (shouldUsePin) {
-        if (!pin) {
+        const shouldUseCloudHsm = getShouldUseCloudHsm()
+        const isAuthenticatedWithBiometrics = authMethod === 'biometrics'
+
+        if (!pin && (!isAuthenticatedWithBiometrics || shouldUseCloudHsm)) {
           setIsSharing(false)
           return handleError({ reason: reasonPinAuthFailed })
         }
 
-        try {
-          await setWalletServiceProviderPin(pin.split('').map(Number))
-        } catch (e) {
-          setIsSharing(false)
-          if (e instanceof InvalidPinError) {
-            onPinError?.()
-            toast.show(t(commonMessages.invalidPinEntered), {
-              customData: {
-                preset: 'danger',
-              },
-            })
-            return
-          }
+        if (pin) {
+          try {
+            await setWalletServiceProviderPin(pin.split('').map(Number))
+          } catch (e) {
+            setIsSharing(false)
+            if (e instanceof InvalidPinError) {
+              onPinError?.()
+              toast.show(t(commonMessages.invalidPinEntered), {
+                customData: {
+                  preset: 'danger',
+                },
+              })
+              return
+            }
 
-          return handleError({
-            reason: reasonAuthFailed,
-            description:
-              e instanceof Error && isDevelopmentModeEnabled ? `Development mode error: ${e.message}` : undefined,
-          })
+            return handleError({
+              reason: reasonAuthFailed,
+              description:
+                e instanceof Error && isDevelopmentModeEnabled ? `Development mode error: ${e.message}` : undefined,
+            })
+          }
         }
       }
 
@@ -215,13 +244,13 @@ export function FunkeOpenIdPresentationNotificationScreen() {
           })[],
         })
 
-        onPinComplete?.()
         await storeSharedActivityForCredentialsForRequest(
           agent,
           credentialsForRequest,
           'success',
           formattedTransactionData
         ).catch(console.error)
+        completeProofFlow(onPinComplete)
       } catch (error) {
         setIsSharing(false)
         if (error instanceof BiometricAuthenticationCancelledError) {
@@ -264,6 +293,7 @@ export function FunkeOpenIdPresentationNotificationScreen() {
       t,
       reasonAuthFailed,
       selectedTransactionData,
+      completeProofFlow,
     ]
   )
 
@@ -278,13 +308,28 @@ export function FunkeOpenIdPresentationNotificationScreen() {
       ).catch(console.error)
     }
 
+    if (openedFromDeeplink) {
+      closeOrReturnToWallet()
+      return
+    }
+
     pushToWallet()
     toast.show(t(commonMessages.informationRequestDeclined), {
       customData: { preset: 'danger' },
     })
-  }, [agent, credentialsForRequest, formattedTransactionData, pushToWallet, stopOverAsking, t, toast])
+  }, [
+    agent,
+    closeOrReturnToWallet,
+    credentialsForRequest,
+    formattedTransactionData,
+    openedFromDeeplink,
+    pushToWallet,
+    stopOverAsking,
+    t,
+    toast,
+  ])
 
-  const replace = useCallback(() => pushToWallet(), [pushToWallet])
+  const replace = useCallback(() => closeOrReturnToWallet(), [closeOrReturnToWallet])
 
   const onTransactionDataSelect = useCallback(
     (index: number, data: { credentialId: string; additionalPayload: object | undefined }) => {

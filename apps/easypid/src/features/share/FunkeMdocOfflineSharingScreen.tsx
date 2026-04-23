@@ -15,6 +15,7 @@ import { usePushToWallet } from '@package/app/hooks/usePushToWallet'
 import { commonMessages } from '@package/translations'
 import { useToastController } from '@package/ui'
 import { useCallback, useEffect, useState } from 'react'
+import { getShouldUseCloudHsm } from '../onboarding/useShouldUseCloudHsm'
 import { shareDeviceResponse, shutdownDataTransfer } from '../proximity'
 import { FunkeOfflineSharingScreen } from './FunkeOfflineSharingScreen'
 import type { onPinSubmitProps } from './slides/PinSlide'
@@ -65,40 +66,46 @@ export function FunkeMdocOfflineSharingScreen({
     [toast, pushToWallet]
   )
 
-  const onProofAccept = async ({ pin, onPinComplete, onPinError }: onPinSubmitProps = {}) => {
+  const onProofAccept = async ({ pin, authMethod, onPinComplete, onPinError }: onPinSubmitProps = {}) => {
     // Already checked for submission in the useEffect
     if (!submission) return
 
+    setIsProcessing(true)
+
     if (shouldUsePin) {
-      if (!pin) {
+      const shouldUseCloudHsm = getShouldUseCloudHsm()
+      const isAuthenticatedWithBiometrics = authMethod === 'biometrics'
+
+      if (!pin && (!isAuthenticatedWithBiometrics || shouldUseCloudHsm)) {
+        setIsProcessing(false)
         onPinError?.()
         return
       }
 
-      setIsProcessing(true)
+      if (pin) {
+        try {
+          await setWalletServiceProviderPin(pin.split('').map(Number))
+        } catch (e) {
+          setIsProcessing(false)
+          if (e instanceof InvalidPinError) {
+            onPinError?.()
+            return handleError({
+              reason: t(commonMessages.invalidPinEntered),
+              redirect: false,
+            })
+          }
 
-      try {
-        await setWalletServiceProviderPin(pin.split('').map(Number))
-      } catch (e) {
-        setIsProcessing(false)
-        if (e instanceof InvalidPinError) {
-          onPinError?.()
           return handleError({
-            reason: t(commonMessages.invalidPinEntered),
-            redirect: false,
+            reason: t({
+              id: 'funkeMdoc.error.auth',
+              message: 'Authentication Error',
+              comment: 'Shown when there is a general auth error during offline flow',
+            }),
+            redirect: true,
+            description:
+              e instanceof Error && isDevelopmentModeEnabled ? `Development mode error: ${e.message}` : undefined,
           })
         }
-
-        return handleError({
-          reason: t({
-            id: 'funkeMdoc.error.auth',
-            message: 'Authentication Error',
-            comment: 'Shown when there is a general auth error during offline flow',
-          }),
-          redirect: true,
-          description:
-            e instanceof Error && isDevelopmentModeEnabled ? `Development mode error: ${e.message}` : undefined,
-        })
       }
     }
 
@@ -114,6 +121,7 @@ export function FunkeMdocOfflineSharingScreen({
       if (e instanceof BiometricAuthenticationCancelledError) {
         // Triggers the pin animation
         onPinError?.()
+        setIsProcessing(false)
         return handleError({
           reason: t(commonMessages.biometricAuthenticationCancelled),
           redirect: false,
@@ -121,6 +129,7 @@ export function FunkeMdocOfflineSharingScreen({
       }
 
       await addActivity('failed')
+      setIsProcessing(false)
       return handleError({
         reason: t({
           id: 'funkeMdoc.error.sharing',

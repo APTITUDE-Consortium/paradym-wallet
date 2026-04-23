@@ -274,6 +274,9 @@ patchedDependencies:
   '@dr.pogodin/react-native-fs':
     hash: iqdjw3isfoxwjv6twnaqhdr3eq
     path: patches/@dr.pogodin__react-native-fs.patch
+  dcql@3.0.0:
+    hash: xhqbx242k5otp3537gxrhg2gn4
+    path: patches/dcql@3.0.0.patch
 
 importers:
 
@@ -7811,7 +7814,7 @@ snapshots:
       buffer: 6.0.3
       class-transformer: 0.5.1
       class-validator: 0.14.3
-      dcql: 3.0.0(typescript@5.9.3)
+      dcql: 3.0.0(patch_hash=xhqbx242k5otp3537gxrhg2gn4)(typescript@5.9.3)
       did-resolver: 4.1.0
       ec-compression: 0.0.1-alpha.12
       lru_map: 0.4.1
@@ -11305,7 +11308,7 @@ snapshots:
 
   date-fns@3.6.0: {}
 
-  dcql@3.0.0(typescript@5.9.3):
+  dcql@3.0.0(patch_hash=xhqbx242k5otp3537gxrhg2gn4)(typescript@5.9.3):
     dependencies:
       valibot: 1.2.0(typescript@5.9.3)
     transitivePeerDependencies:

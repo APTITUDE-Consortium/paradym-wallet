@@ -38,6 +38,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { setWalletServiceProviderPin } from '../../crypto/WalletServiceProviderClient'
 import { useShouldUsePinForSubmission } from '../../hooks/useShouldUsePinForPresentation'
+import { getShouldUseCloudHsm } from '../onboarding/useShouldUseCloudHsm'
 import { type onPinSubmitProps, PinSlide } from '../share/slides/PinSlide'
 import { ShareCredentialsSlide } from '../share/slides/ShareCredentialsSlide'
 import { AuthCodeFlowSlide } from './slides/AuthCodeFlowSlide'
@@ -321,7 +322,7 @@ export function FunkeCredentialNotificationScreen() {
   )
 
   const onPresentationAccept = useCallback(
-    async ({ pin, onPinComplete, onPinError }: onPinSubmitProps) => {
+    async ({ pin, authMethod, onPinComplete, onPinError }: onPinSubmitProps) => {
       if (
         !credentialsForRequest ||
         !resolvedCredentialOffer ||
@@ -335,23 +336,30 @@ export function FunkeCredentialNotificationScreen() {
       setIsSharingPresentation(true)
 
       if (shouldUsePinForPresentation) {
-        if (!pin) {
+        const shouldUseCloudHsm = getShouldUseCloudHsm()
+        const isAuthenticatedWithBiometrics = authMethod === 'biometrics'
+
+        if (!pin && (!isAuthenticatedWithBiometrics || shouldUseCloudHsm)) {
           setErrorReason(t(commonMessages.pinRequiredToAcceptPresentation))
+          setIsSharingPresentation(false)
           return
         }
         // TODO: maybe provide to shareProof method?
-        try {
-          await setWalletServiceProviderPin(pin.split('').map(Number))
-        } catch (error) {
-          if (error instanceof InvalidPinError) {
-            onPinError?.()
+        if (pin) {
+          try {
+            await setWalletServiceProviderPin(pin.split('').map(Number))
+          } catch (error) {
+            if (error instanceof InvalidPinError) {
+              onPinError?.()
+              setIsSharingPresentation(false)
+              toast.show(t(commonMessages.invalidPinEntered), { customData: { preset: 'warning' } })
+              return
+            }
+
+            setErrorReasonWithError(t(commonMessages.presentationInformationCouldNotBeExtracted), error)
             setIsSharingPresentation(false)
-            toast.show(t(commonMessages.invalidPinEntered), { customData: { preset: 'warning' } })
             return
           }
-
-          setErrorReasonWithError(t(commonMessages.presentationInformationCouldNotBeExtracted), error)
-          return
         }
       }
 

@@ -41,6 +41,7 @@ export async function resetWallet(secureUnlock: SecureUnlockReturn<SecureUnlockC
   // I think removing triggers the biometrics somehow. We look at the salt
   // to see if the secure unlock has been setup.
   // await secureWalletKey.removeWalletKey(secureWalletKey.getWalletKeyVersion())
+  await secureWalletKey.removeWalletPin(secureWalletKey.getWalletKeyVersion()).catch(() => undefined)
   await secureWalletKey.removeSalt(secureWalletKey.getWalletKeyVersion())
 
   removeHasFinishedOnboarding()

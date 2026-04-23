@@ -6,6 +6,7 @@ import { WalletUnlockError } from '../error/WalletUnlockError'
 import { kdf } from '../kdf'
 import { walletKeySaltStore } from './walletKeySaltStore'
 import { type WalletBiometricCapability, walletKeyStore } from './walletKeyStore'
+import { walletPinStore } from './walletPinStore'
 
 const mmkv = createMMKV()
 
@@ -78,6 +79,7 @@ export function setWalletKeyVersion(version: number) {
 
 export const secureWalletKey = {
   getWalletKeyUsingPin,
+  ...walletPinStore,
   ...walletKeyStore,
   ...walletKeySaltStore,
   getBiometricUnlockState,

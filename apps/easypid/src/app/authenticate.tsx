@@ -1,13 +1,15 @@
 import { TypedArrayEncoder } from '@credo-ts/core'
 import { initializeAppAgent, useSecureUnlock } from '@easypid/agent'
+import { WalletPinPromptHeader, WalletPinPromptInput } from '@easypid/components/WalletPinPrompt'
 import { useLingui } from '@lingui/react/macro'
-import { PinDotsInput, type PinDotsInputRef } from '@package/app'
+import type { PinDotsInputRef } from '@package/app'
 import { secureWalletKey, useBiometricUnlockState } from '@package/secure-store/secureUnlock'
 import { commonMessages } from '@package/translations'
-import { FlexPage, Heading, HeroIcons, IconContainer, useDeviceMedia, useToastController, YStack } from '@package/ui'
+import { FlexPage, HeroIcons, IconContainer, useDeviceMedia, useToastController, YStack } from '@package/ui'
 import { Redirect, useLocalSearchParams } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect, useRef, useState } from 'react'
+import { storeWalletPinForBiometricsIfAvailable } from '../crypto/biometricWalletPin'
 import { InvalidPinError } from '../crypto/error'
 import { useResetWalletDevMenu } from '../utils/resetWallet'
 
@@ -144,24 +146,26 @@ export default function Authenticate() {
   const unlockUsingPin = async (pin: string) => {
     if (secureUnlock.state !== 'locked') return
     await secureUnlock.unlockUsingPin(pin)
+    await storeWalletPinForBiometricsIfAvailable(pin)
   }
 
   return (
     <FlexPage flex-1 alignItems="center">
       <YStack fg={1} gap="$6" mb={noBottomSafeArea ? -additionalPadding : undefined}>
         <YStack flex-1 alignItems="center" justifyContent="flex-end" gap="$4">
-          <IconContainer h="$4" w="$4" ai="center" jc="center" icon={<HeroIcons.LockClosedFilled />} />
-          <Heading heading="h2" fontWeight="$semiBold">
-            {t(commonMessages.enterPin)}
-          </Heading>
+          <WalletPinPromptHeader
+            title={t(commonMessages.enterPin)}
+            centerHeader
+            headerIcon={<IconContainer h="$4" w="$4" ai="center" jc="center" icon={<HeroIcons.LockClosedFilled />} />}
+            titleHeading="h2"
+            titleFontWeight="$semiBold"
+          />
         </YStack>
-        <PinDotsInput
+        <WalletPinPromptInput
           isLoading={isLoading}
-          ref={pinInputRef}
-          pinLength={6}
+          inputRef={pinInputRef}
           onPinComplete={unlockUsingPin}
           onBiometricsTap={showBiometricUnlockAction ? unlockUsingBiometrics : undefined}
-          useNativeKeyboard={false}
           biometricsType={biometricsType ?? 'fingerprint'}
         />
       </YStack>

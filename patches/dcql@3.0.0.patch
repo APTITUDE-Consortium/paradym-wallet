@@ -1,0 +1,49 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 468daa3b1fb2dd7c0094b1395e90d19c42fd4da8..2876768474aa14e3afb778a2010a0d500a32aa55 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -669,7 +669,21 @@ const runTrustedAuthoritiesQuery = (credentialQuery, credential) => {
+ 
+ //#endregion
+ //#region src/dcql-parser/dcql-credential-query-result.ts
++const supportedCredentialQueryFormats = [
++	"mso_mdoc",
++	"dc+sd-jwt",
++	"vc+sd-jwt",
++	"ldp_vc",
++	"jwt_vc_json"
++];
++const isUnsupportedCredentialQueryFormat = (format) => !supportedCredentialQueryFormats.includes(format);
+ const runCredentialQuery = (credentialQuery, ctx) => {
++	if (isUnsupportedCredentialQueryFormat(credentialQuery.format)) return {
++		success: false,
++		credential_query_id: credentialQuery.id,
++		failed_credentials: void 0,
++		valid_credentials: void 0
++	};
+ 	const { credentials, presentation } = ctx;
+ 	const validCredentials = [];
+ 	const failedCredentials = [];
+@@ -742,12 +756,20 @@ let DcqlCredentialQuery;
+ 		claims: v.pipe(v.optional(vNonEmptyArray(DcqlClaimsQuery.vW3cSdJwtVc)), v.description("OPTIONAL. A non-empty array of objects as that specifies claims in the requested Credential.")),
+ 		meta: v.pipe(v.pipe(v.object({ type_values: v.pipe(vNonEmptyArray(vNonEmptyArray(v.string())), v.description("REQUIRED. An array of string arrays that specifies the fully expanded types (IRIs) after the @context was applied that the Verifier accepts to be presented in the Presentation. Each of the top-level arrays specifies one alternative to match the type values of the Verifiable Credential against. Each inner array specifies a set of fully expanded types that MUST be present in the type property of the Verifiable Credential, regardless of order or the presence of additional types.")) })), v.description("REQUIRED. An object defining additional properties requested by the Verifier that apply to the metadata and validity data of the Credential."))
+ 	});
+-	_DcqlCredentialQuery.vModel = v.variant("format", [
++	const vUnsupported = _DcqlCredentialQuery.vUnsupported = v.object({
++		...vBase.entries,
++		format: v.pipe(v.string(), v.check(isUnsupportedCredentialQueryFormat, "Unsupported credential format")),
++		claims: v.optional(v.array(v.unknown())),
++		meta: v.optional(v.record(v.string(), v.unknown()))
++	});
++	_DcqlCredentialQuery.vModel = v.union([
+ 		vMdoc,
+ 		vW3cVc,
+-		vSdJwtVc
++		vSdJwtVc,
++		vUnsupported
+ 	]);
+ 	_DcqlCredentialQuery.validate = (credentialQuery) => {
++		if (isUnsupportedCredentialQueryFormat(credentialQuery.format)) return;
+ 		claimSetIdsAreDefined(credentialQuery);
+ 	};
+ })(DcqlCredentialQuery || (DcqlCredentialQuery = {}));

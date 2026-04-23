@@ -14,6 +14,7 @@ import { askar } from '@openwallet-foundation/askar-react-native'
 import type { EasyPIDAppAgent } from '@package/agent'
 import { secureWalletKey } from '@package/secure-store/secureUnlock'
 import { getWalletId } from '../agent/walletId'
+import { storeWalletPinForBiometricsIfAvailable } from './biometricWalletPin'
 import { InvalidPinError } from './error'
 import { deriveKeypairFromPin } from './pin'
 
@@ -21,8 +22,8 @@ import { deriveKeypairFromPin } from './pin'
 let __pin: Array<number> | undefined
 export const setWalletServiceProviderPin = async (pin: Array<number>, validatePin = true) => {
   const pinString = pin.join('')
+  const walletKeyVersion = secureWalletKey.getWalletKeyVersion()
   if (validatePin) {
-    const walletKeyVersion = secureWalletKey.getWalletKeyVersion()
     const walletKey = await secureWalletKey.getWalletKeyUsingPin(pinString, walletKeyVersion)
     const walletId = getWalletId(walletKeyVersion)
 
@@ -51,6 +52,8 @@ export const setWalletServiceProviderPin = async (pin: Array<number>, validatePi
     }
 
     await agent.shutdown()
+
+    await storeWalletPinForBiometricsIfAvailable(pinString)
   }
   __pin = pin
 }

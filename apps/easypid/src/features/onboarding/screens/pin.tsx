@@ -1,5 +1,5 @@
+import { WalletPinPromptInput } from '@easypid/components/WalletPinPrompt'
 import type { PinDotsInputRef } from '@package/app'
-import { PinDotsInput } from '@package/app'
 import { useDeviceMedia, YStack } from '@package/ui'
 import { useRef, useState } from 'react'
 
@@ -25,13 +25,7 @@ export default function OnboardingPinEnter({ goToNextStep }: OnboardingPinEnterP
 
   return (
     <YStack mt="$10" fg={1} mb={noBottomSafeArea ? -additionalPadding : undefined}>
-      <PinDotsInput
-        onPinComplete={onPinComplete}
-        isLoading={isLoading}
-        pinLength={6}
-        ref={pinRef}
-        useNativeKeyboard={false}
-      />
+      <WalletPinPromptInput onPinComplete={onPinComplete} isLoading={isLoading} inputRef={pinRef} disableBiometrics />
     </YStack>
   )
 }

@@ -37,6 +37,7 @@ import { useRouter } from 'expo-router'
 import type React from 'react'
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Linking, Platform } from 'react-native'
+import { storeWalletPinForBiometricsIfAvailable } from '../../crypto/biometricWalletPin'
 import { useHasFinishedOnboarding } from './hasFinishedOnboarding'
 import { onboardingSteps } from './steps'
 import { useShouldUseCloudHsm } from './useShouldUseCloudHsm'
@@ -234,6 +235,9 @@ export function OnboardingContextProvider({
     try {
       if (secureUnlock.state === 'acquired-wallet-key') {
         await secureUnlock.setWalletKeyValid({ agent }, { enableBiometrics })
+        if (walletPin) {
+          await storeWalletPinForBiometricsIfAvailable(walletPin)
+        }
       } else {
         const biometricUnlockState = await secureWalletKey.getBiometricUnlockState(
           secureWalletKey.getWalletKeyVersion()
@@ -241,6 +245,9 @@ export function OnboardingContextProvider({
 
         if (!biometricUnlockState.configured) {
           await secureUnlock.enableBiometricUnlock()
+        }
+        if (walletPin) {
+          await storeWalletPinForBiometricsIfAvailable(walletPin)
         }
       }
 

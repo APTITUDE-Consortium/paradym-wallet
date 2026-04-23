@@ -85,7 +85,7 @@ export function redirectSystemPath({ path, initial }: { path: string; initial: b
       redirectPath = `/notifications/openIdCredential?uri=${encodeURIComponent(invitationData.data)}`
     }
     if (invitationData.type === 'openid-authorization-request') {
-      redirectPath = `/notifications/openIdPresentation?uri=${encodeURIComponent(invitationData.data)}`
+      redirectPath = `/notifications/openIdPresentation?uri=${encodeURIComponent(invitationData.data)}&openedFromDeeplink=true`
     }
     if (invitationData.type === 'didcomm') {
       redirectPath = `/notifications/didcomm?invitationUrl=${encodeURIComponent(invitationData.data)}`

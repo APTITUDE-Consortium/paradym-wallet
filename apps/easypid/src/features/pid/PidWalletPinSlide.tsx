@@ -1,6 +1,7 @@
-import { PinDotsInput, type PinDotsInputRef, useWizard } from '@package/app'
-import { Heading, Paragraph, useDeviceMedia, YStack } from '@package/ui'
+import { type PinDotsInputRef, useWizard } from '@package/app'
+import { useDeviceMedia, YStack } from '@package/ui'
 import { useRef, useState } from 'react'
+import { WalletPinPromptHeader, WalletPinPromptInput } from '../../components/WalletPinPrompt'
 
 interface PidWalletPinSlideProps {
   title: string
@@ -33,18 +34,11 @@ export function PidWalletPinSlide({ title, subtitle, onEnterPin }: PidWalletPinS
     <YStack fg={1} jc="space-between" mb={noBottomSafeArea ? -additionalPadding : undefined}>
       <YStack gap="$6">
         <YStack gap="$3">
-          <Heading heading="h1">{title}</Heading>
-          {subtitle && <Paragraph>{subtitle}</Paragraph>}
+          <WalletPinPromptHeader title={title} subtitle={subtitle} titleHeading="h1" />
         </YStack>
       </YStack>
       <YStack flexGrow={1} mt="$10">
-        <PinDotsInput
-          isLoading={isLoading}
-          ref={ref}
-          pinLength={6}
-          onPinComplete={onSubmitPin}
-          useNativeKeyboard={false}
-        />
+        <WalletPinPromptInput isLoading={isLoading} inputRef={ref} onPinComplete={onSubmitPin} />
       </YStack>
     </YStack>
   )

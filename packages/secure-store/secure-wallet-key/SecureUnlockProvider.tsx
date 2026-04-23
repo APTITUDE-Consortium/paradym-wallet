@@ -80,7 +80,6 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
   const [state, setState] = useState<SecureUnlockState>('initializing')
   const [walletKey, setWalletKey] = useState<string>()
   const [canTryUnlockingUsingBiometrics, setCanTryUnlockingUsingBiometrics] = useState<boolean>(true)
-  const [biometricsUnlockAttempts, setBiometricsUnlockAttempts] = useState(0)
   const [unlockMethod, setUnlockMethod] = useState<SecureUnlockMethod>()
   const [context, setContext] = useState<Context>()
   const [isUnlocking, setIsUnlocking] = useState(false)
@@ -115,7 +114,9 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
   }
 
   const disableBiometricUnlock = async () => {
-    await secureWalletKey.removeWalletKey(secureWalletKey.getWalletKeyVersion())
+    const walletKeyVersion = secureWalletKey.getWalletKeyVersion()
+    await secureWalletKey.removeWalletKey(walletKeyVersion)
+    await secureWalletKey.removeWalletPin(walletKeyVersion).catch(() => undefined)
     await syncBiometricUnlockState()
   }
 
@@ -135,7 +136,6 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
     setState('initializing')
     setWalletKey(undefined)
     setCanTryUnlockingUsingBiometrics(true)
-    setBiometricsUnlockAttempts(0)
     setUnlockMethod(undefined)
     setContext(undefined)
     setIsUnlocking(false)
@@ -210,7 +210,6 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
         if (!biometricUnlockState.canUnlockNow) return null
 
         setIsUnlocking(true)
-        setBiometricsUnlockAttempts((attempts) => attempts + 1)
         try {
           const walletKey = await secureWalletKey.getWalletKeyUsingBiometrics(secureWalletKey.getWalletKeyVersion())
           if (walletKey) {
@@ -223,17 +222,12 @@ function _useSecureUnlockState<Context extends Record<string, unknown>>(): Secur
 
           return walletKey
         } catch (error) {
-          // If use cancelled we won't allow trying using biometrics again
           if (error instanceof BiometricAuthenticationCancelledError) {
-            setCanTryUnlockingUsingBiometrics(false)
+            await syncBiometricUnlockState()
           } else if (error instanceof BiometricAuthenticationNotEnabledError) {
             await disableBiometricUnlock()
           } else if (error instanceof BiometricAuthenticationError) {
             await syncBiometricUnlockState()
-          }
-          // If other error, we will allow up to three attempts
-          else if (biometricsUnlockAttempts > 3) {
-            setCanTryUnlockingUsingBiometrics(false)
           }
         } finally {
           setIsUnlocking(false)
