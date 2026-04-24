@@ -5,7 +5,7 @@
 		"comments": [
 			"Label shown after an organization name if it is a demo version"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 92]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 90]],
 		"translation": "(Demo)"
 	},
 	"credentials.totalLabelPlural": {
@@ -23,7 +23,7 @@
 			"amountShared": ["amountShared"]
 		},
 		"comments": ["Shown when multiple credentials were successfully shared"],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 219]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 221]],
 		"translation": "{amountShared} todistetta jaettiin."
 	},
 	"inbox.notificationType.fromLabel": {
@@ -33,7 +33,7 @@
 			"baseLabel": ["baseLabel"]
 		},
 		"comments": ["Label like \"Card from X\" or \"Request from Y\""],
-		"origin": [["src/features/didcomm/InboxScreen.tsx", 91]],
+		"origin": [["src/features/didcomm/InboxScreen.tsx", 90]],
 		"translation": "{baseLabel} taholta {0}"
 	},
 	"dateFormatting.mulitpleDays": {
@@ -74,7 +74,7 @@
 			"name": ["name"]
 		},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 163]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 164]],
 		"translation": "{name} haluaa muodostaa yhteyden kanssasi."
 	},
 	"verifyPartySlide.signingSubtitle": {
@@ -83,7 +83,7 @@
 			"name": ["name"]
 		},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 141]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 142]],
 		"translation": "{name} haluaa luoda digitaalisen allekirjoituksen asiakirjalle."
 	},
 	"verifyPartySlide.offerCardSubtitle": {
@@ -92,7 +92,7 @@
 			"name": ["name"]
 		},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 131]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 132]],
 		"translation": "{name} tarjoaa sinulle kortin."
 	},
 	"verifyPartySlide.requestSubtitle": {
@@ -101,7 +101,7 @@
 			"name": ["name"]
 		},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 153]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 154]],
 		"translation": "{name} pyytää sinulta tietoja."
 	},
 	"credentials.totalLabel": {
@@ -115,7 +115,7 @@
 		"message": "1 credential was shared.",
 		"placeholders": {},
 		"comments": ["Shown when one credential was successfully shared"],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 224]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 226]],
 		"translation": "1 todiste jaettiin."
 	},
 	"dateFormatting.oneDay": {
@@ -133,7 +133,7 @@
 		"comments": [
 			"A sentence that introduces a list of organizations that approved the current party"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 110]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 108]],
 		"translation": "Lista organisaatioista, jotka luottavat toimijaan {name}."
 	},
 	"trust.approvedListWithoutOrganizationName": {
@@ -142,7 +142,7 @@
 		"comments": [
 			"A sentence that introduces a list of organizations that approved the current party, but the organization name is not known"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 115]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 113]],
 		"translation": "Lista organisaatioista, jotka luottavat tähän toimijaan."
 	},
 	"offlineQr.instruction": {
@@ -174,7 +174,7 @@
 		"comments": [
 			"Screen title that describes information about a trusted party or organization"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 59]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 57]],
 		"translation": "Tietoja tästä toimijasta"
 	},
 	"menu.item.about": {
@@ -188,14 +188,14 @@
 		"message": "Accept",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 180]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 176]],
 		"translation": "Hyväksy"
 	},
 	"biometrics.activateBiometricsButton": {
 		"message": "Activate Biometrics",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/onboarding/onboardingContext.tsx", 296]],
+		"origin": [["src/features/onboarding/onboardingContext.tsx", 273]],
 		"translation": "Ota biometria käyttöön"
 	},
 	"onboarding.biometrics.subtitle": {
@@ -218,7 +218,7 @@
 		"comments": [
 			"Title of the activity screen showing shared or received credentials"
 		],
-		"origin": [["src/features/activity/FunkeActivityScreen.tsx", 22]],
+		"origin": [["src/features/activity/FunkeActivityScreen.tsx", 21]],
 		"translation": "Toiminta"
 	},
 	"activity.emptyDescription": {
@@ -227,7 +227,7 @@
 		"comments": [
 			"Shown below the empty activity title to explain why the list is empty"
 		],
-		"origin": [["src/features/activity/FunkeActivityScreen.tsx", 32]],
+		"origin": [["src/features/activity/FunkeActivityScreen.tsx", 31]],
 		"translation": "Toiminta näkyy täällä kun jaat tai vastaanotat todisteita."
 	},
 	"onboardingWalletExplanation.slide1.subtitle": {
@@ -296,7 +296,7 @@
 		"comments": [
 			"Shown as a warning box when viewing a trusted party’s detail"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 71]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 69]],
 		"translation": "Mieti aina tarkkaan, onko tietojen jakaminen järkevää."
 	},
 	"interactionError.message.connect": {
@@ -322,7 +322,7 @@
 		"placeholders": {},
 		"comments": ["Description of the error box explaining pending credentials"],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 120]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 121]
 		],
 		"translation": "Kortin noutaminen myöntäjältä epäonnistui."
 	},
@@ -353,35 +353,35 @@
 		"message": "An unknown error occurred while changing the biometric authentication settings.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 153]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 149]],
 		"translation": "Tuntematon virhe tapahtui biometrisen tunnistuksen asetusten muuttamisessa."
 	},
 	"verifyPartySlide.connectSubtitleUnknownOrganization": {
 		"message": "An unknown organization wants to connect with you.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 165]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 166]],
 		"translation": "Tuntematon toimija haluaa muodostaa yhteyden kanssasi."
 	},
 	"verifyPartySlide.signingSubtitleUnknownOrganization": {
 		"message": "An unknown organization wants to interact to create a digital signature for a document.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 145]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 146]],
 		"translation": "Tuntematon toimija ehdottaa asiakirjan allekirjoittamista."
 	},
 	"verifyPartySlide.offerCardSubtitleUnknownOrganization": {
 		"message": "An unknown organization wants to offer you a card.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 133]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 134]],
 		"translation": "Tuntematon toimija tarjoaa sinulle kortin."
 	},
 	"verifyPartySlide.requestSubtitleUnknownOrganization": {
 		"message": "An unknown organization wants to request information from you.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 155]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 156]],
 		"translation": "Tuntematon toimija pyytää sinulta tietoja."
 	},
 	"menu.section.app": {
@@ -397,14 +397,14 @@
 			"0": ["trustedEntitiesWithoutSelf.length"]
 		},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 184]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 185]],
 		"translation": "{0} luottavaa organisaatiota"
 	},
 	"verifyPartySlide.approvedByOneOrganization": {
 		"message": "Approved by one organization",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 189]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 190]],
 		"translation": "1 luottava organisaatio"
 	},
 	"common.archiveCardTitle": {
@@ -418,23 +418,14 @@
 		"message": "Are you sure you want to reset the onboarding process?",
 		"placeholders": {},
 		"comments": ["Confirmation message for onboarding reset"],
-		"origin": [["src/app/onboarding/index.tsx", 50]],
+		"origin": [["src/app/onboarding/index.tsx", 54]],
 		"translation": "Oletko varma, että haluat aloittaa käyttöönoton alusta?"
-	},
-	"pinLocked.alertMessage": {
-		"message": "Are you sure you want to reset the wallet?",
-		"placeholders": {},
-		"comments": [
-			"Message body of the confirmation dialog (action button) for wallet reset"
-		],
-		"origin": [["src/features/wallet/FunkePinLockedScreen.tsx", 17]],
-		"translation": "Oletko varma, että haluat nollata lompakon?"
 	},
 	"common.confirmResetWallet": {
 		"message": "Are you sure you want to reset the wallet?",
 		"placeholders": {},
 		"comments": ["Confirmation prompt before wallet reset"],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 100]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 96]],
 		"translation": "Haluatko varmasti nollata lompakon?"
 	},
 	"confirmationSheet.title": {
@@ -448,7 +439,7 @@
 		"message": "Authenticate",
 		"placeholders": {},
 		"comments": ["Button label to start authentication process"],
-		"origin": [["src/features/receive/slides/AuthCodeFlowSlide.tsx", 153]],
+		"origin": [["src/features/receive/slides/AuthCodeFlowSlide.tsx", 155]],
 		"translation": "Tunnistaudu"
 	},
 	"funkeMdoc.error.auth": {
@@ -457,7 +448,7 @@
 		"comments": [
 			"Shown when there is a general auth error during offline flow"
 		],
-		"origin": [["src/features/share/FunkeMdocOfflineSharingScreen.tsx", 93]],
+		"origin": [["src/features/share/FunkeMdocOfflineSharingScreen.tsx", 98]],
 		"translation": "Tunnistautumisvirhe"
 	},
 	"presentation.authFailed": {
@@ -465,9 +456,18 @@
 		"placeholders": {},
 		"comments": ["Shown when authentication with PIN fails for other reasons"],
 		"origin": [
-			["src/features/share/FunkeOpenIdPresentationNotificationScreen.tsx", 61]
+			["src/features/share/FunkeOpenIdPresentationNotificationScreen.tsx", 57]
 		],
 		"translation": "Tunnistautuminen epäonnistui"
+	},
+	"browserAuthFlow.authorizationCancelled": {
+		"message": "Authorization cancelled",
+		"placeholders": {},
+		"comments": [],
+		"origin": [
+			["src/features/receive/FunkeOpenIdCredentialNotificationScreen.tsx", 163]
+		],
+		"translation": "Valtuutus peruutettu"
 	},
 	"common.authorizationCancelled": {
 		"message": "Authorization cancelled",
@@ -487,7 +487,7 @@
 		"message": "Back",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 188]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 184]],
 		"translation": "Takaisin"
 	},
 	"betaTag": {
@@ -501,7 +501,7 @@
 		"message": "Biometric authentication cancelled",
 		"placeholders": {},
 		"comments": ["Shown when the user cancels biometric authentication"],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 130]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 126]],
 		"translation": "Biometrinen tunnistus peruttu"
 	},
 	"common.biometricDisabled": {
@@ -510,7 +510,7 @@
 		"comments": [
 			"Shown as toast when the user disabled biometric authentication"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 135]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 131]],
 		"translation": "Biometrinen tunnistus poistettu käytöstä"
 	},
 	"common.biometricEnabled": {
@@ -519,7 +519,7 @@
 		"comments": [
 			"Shown as toast when the user enabled biometric authentication"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 144]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 140]],
 		"translation": "Biometrinen tunnistus otettu käyttöön"
 	},
 	"settings.biometricsNotSupportedDescription": {
@@ -528,29 +528,38 @@
 		"comments": [
 			"Description that the biometric unlock feature is not supported on this device"
 		],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 180]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 101]],
 		"translation": "Biometrinen tunnistus on poistettu käytöstä tai sitä ei tueta tällä laitteella."
 	},
 	"common.biometricAuthenticationMustBeEnabledInSettings": {
 		"message": "Biometric authentication not configured, enable biometrics in the settings of your device",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 149]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 145]],
 		"translation": "Biometrinen tunnistus ei ole määritetty, ota biometriikka käyttöön laitteesi asetuksissa"
 	},
 	"common.biometricNotEnabled": {
 		"message": "Biometric authentication not enabled",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 140]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 136]],
 		"translation": "Biometrinen tunnistus ei ole käytössä"
 	},
 	"settings.biometricsToggle": {
 		"message": "Biometric unlock",
 		"placeholders": {},
 		"comments": ["Label for the toggle to enable biometric unlock"],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 171]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 187]],
 		"translation": "Biometrinen lukituksen avaus"
+	},
+	"settings.biometricsCurrentlyUnavailableDescription": {
+		"message": "Biometric unlock is configured for this wallet, but currently unavailable on this device. You can turn it off here and set it up again later.",
+		"placeholders": {},
+		"comments": [
+			"Description shown when biometric unlock is configured, but the device can no longer use it right now."
+		],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 107]],
+		"translation": "Biometrinen avaus on määritetty tälle lompakolle, mutta se ei ole tällä laitteella tällä hetkellä käytettävissä. Voit poistaa sen käytöstä täällä ja ottaa sen myöhemmin uudelleen käyttöön."
 	},
 	"biometrics.disabled": {
 		"message": "Biometrics disabled",
@@ -558,7 +567,7 @@
 		"comments": [
 			"Toast shows when biometrics has successfully been disabled from settings."
 		],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 133]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 152]],
 		"translation": "Biometriikka poistettu käytöstä"
 	},
 	"biometrics.enabled": {
@@ -567,7 +576,7 @@
 		"comments": [
 			"Toast shows when biometrics has successfully been enabled from settings."
 		],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 99]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 120]],
 		"translation": "Biometriikka otettu käyttöön"
 	},
 	"common.fields.birthYear": {
@@ -606,7 +615,7 @@
 		"message": "Card",
 		"placeholders": {},
 		"comments": ["Label for a notification about a received credential"],
-		"origin": [["src/features/didcomm/InboxScreen.tsx", 79]],
+		"origin": [["src/features/didcomm/InboxScreen.tsx", 78]],
 		"translation": "Kortti"
 	},
 	"common.cardAdded": {
@@ -624,8 +633,8 @@
 			"Title shown in header for the credential detail attributes screen"
 		],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 94],
-			["src/features/wallet/FunkeCredentialDetailScreen.tsx", 108]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 93],
+			["src/features/wallet/FunkeCredentialDetailScreen.tsx", 109]
 		],
 		"translation": "Kortin tiedot"
 	},
@@ -633,7 +642,7 @@
 		"message": "Card details",
 		"placeholders": {},
 		"comments": ["Title of the credential details screen"],
-		"origin": [["src/features/wallet/FunkeCredentialDetailScreen.tsx", 90]],
+		"origin": [["src/features/wallet/FunkeCredentialDetailScreen.tsx", 91]],
 		"translation": "Kortin tiedot"
 	},
 	"cardLifecycle.limitedByDate.expired.title": {
@@ -686,9 +695,9 @@
 			"Title of the info box explaining that the credential is not available yet"
 		],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 131],
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 148],
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 169]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 132],
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 149],
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 170]
 		],
 		"translation": "Kortti ei vielä saatavilla"
 	},
@@ -756,7 +765,7 @@
 		"message": "Cards",
 		"placeholders": {},
 		"comments": ["Heading for the list of user credentials"],
-		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 47]],
+		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 50]],
 		"translation": "Kortit"
 	},
 	"menu.item.cards": {
@@ -772,7 +781,7 @@
 		"comments": [
 			"Section heading for list of received cards in the activity detail screen"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 164]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 166]],
 		"translation": "Kortit"
 	},
 	"onboarding.pin.title": {
@@ -846,7 +855,7 @@
 		"message": "Could not share device response",
 		"placeholders": {},
 		"comments": ["Shown when shareDeviceResponse fails"],
-		"origin": [["src/features/share/FunkeMdocOfflineSharingScreen.tsx", 125]],
+		"origin": [["src/features/share/FunkeMdocOfflineSharingScreen.tsx", 128]],
 		"translation": "Laitevastauksen jakaminen epäonnistui"
 	},
 	"common.fields.country": {
@@ -863,7 +872,7 @@
 			"Fallback name shown when a credential does not have a display name"
 		],
 		"origin": [
-			["src/features/share/components/RequestedAttributesSection.tsx", 52]
+			["src/features/share/components/RequestedAttributesSection.tsx", 55]
 		],
 		"translation": "Todiste"
 	},
@@ -871,14 +880,14 @@
 		"message": "Credential",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 200]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 196]],
 		"translation": "Todiste"
 	},
 	"credential.declined": {
 		"message": "Credential has been declined.",
 		"placeholders": {},
 		"comments": ["Shown in a toast when user declines the credential"],
-		"origin": [["src/features/didcomm/CredentialSlides.tsx", 72]],
+		"origin": [["src/features/didcomm/CredentialSlides.tsx", 79]],
 		"translation": "Todiste on hylätty."
 	},
 	"common.credentialInformationCouldNotBeExtracted": {
@@ -887,14 +896,14 @@
 		"comments": [
 			"Toast or message shown when a credential offer could not be parsed correctly"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 105]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 101]],
 		"translation": "Todisteen tietoja ei voitu lukea"
 	},
 	"credentials.notFound": {
 		"message": "Credential not found",
 		"placeholders": {},
 		"comments": ["Shown if a credential is missing or cannot be loaded"],
-		"origin": [["src/features/wallet/FunkeCredentialDetailScreen.tsx", 42]],
+		"origin": [["src/features/wallet/FunkeCredentialDetailScreen.tsx", 43]],
 		"translation": "Todistetta ei löytynyt"
 	},
 	"credentialDetail.errorMessage": {
@@ -917,7 +926,7 @@
 		"message": "Credentials will appear here once you receive them.",
 		"placeholders": {},
 		"comments": ["Subtext explaining that credentials will appear later"],
-		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 70]],
+		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 73]],
 		"translation": "Todisteet näkyvät täällä, kun vastaanotat niitä."
 	},
 	"noContentWallet.message": {
@@ -931,7 +940,7 @@
 		"message": "Data Request",
 		"placeholders": {},
 		"comments": ["Fallback title for a proof request notification"],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 201]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 197]],
 		"translation": "Tietopyyntö"
 	},
 	"common.fields.dateOfBirth": {
@@ -945,7 +954,7 @@
 		"message": "Decline",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 184]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 180]],
 		"translation": "Hylkää"
 	},
 	"didcommCancelFlow.issuance.title": {
@@ -968,7 +977,7 @@
 		"message": "Deleted credential",
 		"placeholders": {},
 		"comments": ["Shown when a credential no longer exists in the wallet"],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 79]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 81]],
 		"translation": "Todiste poistettu"
 	},
 	"trust.demoOrg": {
@@ -977,21 +986,21 @@
 		"comments": [
 			"Shown under the name of an organization to indicate that it is a demo"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 151]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 149]],
 		"translation": "Demo-organisaatio"
 	},
 	"verifyPartySlide.demoTrustedEntityTitle": {
 		"message": "Demo organization",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 211]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 212]],
 		"translation": "Demo-organisaatio"
 	},
 	"settings.developmentMode": {
 		"message": "Development Mode",
 		"placeholders": {},
 		"comments": ["Label for the toggle to enable developer mode"],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 192]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 200]],
 		"translation": "Kehitystila"
 	},
 	"nfcScanner.scanning.title": {
@@ -1007,7 +1016,7 @@
 		"message": "Do not share real data",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 215]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 216]],
 		"translation": "Älä jaa oikeita tietoja"
 	},
 	"verifyPartySlide.interactWithHeading": {
@@ -1016,7 +1025,7 @@
 			"name": ["name"]
 		},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 123]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 124]],
 		"translation": "Luotatko {name}?"
 	},
 	"receiveCredential.checkInformationHeader": {
@@ -1032,7 +1041,7 @@
 		"message": "Document",
 		"placeholders": {},
 		"comments": ["Heading above the document name"],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 100]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 101]],
 		"translation": "Asiakirja"
 	},
 	"activity.documentHeading": {
@@ -1041,7 +1050,7 @@
 		"comments": [
 			"Section heading shown when a document was signed or attempted to be signed"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 246]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 248]],
 		"translation": "Asiakirja"
 	},
 	"common.credentials.mdl.documentNumber": {
@@ -1161,7 +1170,7 @@
 		"message": "Error occurred during onboarding",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/onboarding/onboardingContext.tsx", 268]],
+		"origin": [["src/features/onboarding/onboardingContext.tsx", 245]],
 		"translation": "Virhe käyttöönotossa"
 	},
 	"notification.errorParsingInvitation": {
@@ -1170,7 +1179,7 @@
 		"comments": [
 			"Generic error message shown when an invitation could not be parsed"
 		],
-		"origin": [["src/features/didcomm/DidCommNotificationScreen.tsx", 35]],
+		"origin": [["src/features/didcomm/DidCommNotificationScreen.tsx", 37]],
 		"translation": "Virhe kutsun käsittelyssä"
 	},
 	"common.errorWhileRetrievingCredentials": {
@@ -1179,7 +1188,7 @@
 		"comments": [
 			"Toast or message shown when an error occurred during retrieval of credentials"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 110]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 106]],
 		"translation": "Virhe todisteiden hakemisessa"
 	},
 	"common.expired": {
@@ -1211,14 +1220,14 @@
 		"message": "Export debug logs",
 		"placeholders": {},
 		"comments": ["Label for the button to export debug logs"],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 204]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 212]],
 		"translation": "Vie virheenkorjauslokeja"
 	},
 	"settings.exportDebugLogsDescription": {
 		"message": "Export the last 1000 debug logs from the wallet. Note that this can contain sensitive information.",
 		"placeholders": {},
 		"comments": ["Description for the feature to export debug logs"],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 211]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 221]],
 		"translation": "Vie lompakon viimeiset 1000 virheenkorjauslokia. Huomaa, että lokit voivat sisältää arkaluonteista tietoa."
 	},
 	"activity.latest.failedCard": {
@@ -1234,7 +1243,7 @@
 		"message": "Failed to parse invitation.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 220]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 216]],
 		"translation": "Kutsun käsittely epäonnistui."
 	},
 	"deferredCredentials.failedToRetrieveCard": {
@@ -1242,7 +1251,7 @@
 		"placeholders": {},
 		"comments": ["Title of the error box explaining pending credentials"],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 115]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 116]
 		],
 		"translation": "Kortin noutaminen epäonnistui"
 	},
@@ -1278,7 +1287,7 @@
 		"message": "First time interaction",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 229]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 230]],
 		"translation": "Ensimmäinen yhteys"
 	},
 	"funkeAboutScreen.contactIntro": {
@@ -1362,9 +1371,7 @@
 		"message": "greater than",
 		"placeholders": {},
 		"comments": ["Used in predicate statements like: age greater than 18"],
-		"origin": [
-			["../../packages/agent/src/hooks/useDidCommPresentationActions.ts", 29]
-		],
+		"origin": [["src/utils/formatePredicate.ts", 5]],
 		"translation": "suurempi kuin"
 	},
 	"predicate.greaterThanOrEqual": {
@@ -1373,9 +1380,7 @@
 		"comments": [
 			"Used in predicate statements like: age greater than or equal to 18"
 		],
-		"origin": [
-			["../../packages/agent/src/hooks/useDidCommPresentationActions.ts", 34]
-		],
+		"origin": [["src/utils/formatePredicate.ts", 10]],
 		"translation": "suurempi tai yhtä suuri kuin"
 	},
 	"home.helloWithName": {
@@ -1399,7 +1404,7 @@
 		"placeholders": {},
 		"comments": ["Button label: toggles visibility of metadata attributes"],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 177]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 176]
 		],
 		"translation": "Piilota metatiedot"
 	},
@@ -1419,7 +1424,7 @@
 			"Button label that toggles visibility of shareable attributes"
 		],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 160]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 159]
 		],
 		"translation": "Piilota jaettavat tiedot"
 	},
@@ -1476,7 +1481,8 @@
 		"placeholders": {},
 		"comments": [],
 		"origin": [
-			["src/features/receive/FunkeOpenIdCredentialNotificationScreen.tsx", 568]
+			["src/features/receive/FunkeOpenIdCredentialNotificationScreen.tsx", 290],
+			["src/features/receive/FunkeOpenIdCredentialNotificationScreen.tsx", 442]
 		],
 		"translation": "Jos lopetat, korttitarjous peruutetaan."
 	},
@@ -1484,7 +1490,7 @@
 		"message": "Inbox",
 		"placeholders": {},
 		"comments": ["Header title for the inbox screen"],
-		"origin": [["src/features/didcomm/InboxScreen.tsx", 35]],
+		"origin": [["src/features/didcomm/InboxScreen.tsx", 34]],
 		"translation": "Saapuneet"
 	},
 	"submission.offlineRequestDescription": {
@@ -1502,14 +1508,14 @@
 		"comments": [
 			"Toast or message shown when a presentation was successfully shared"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 125]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 121]],
 		"translation": "Tiedot on jaettu onnistuneesti."
 	},
 	"common.informationRequestDeclined": {
 		"message": "Information request has been declined.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 171]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 167]],
 		"translation": "Tietopyyntö on hylätty."
 	},
 	"common.informationShared": {
@@ -1553,7 +1559,7 @@
 		"comments": [
 			"Shown when the invitation data format is not supported or could not be parsed"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 211]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 207]],
 		"translation": "Kutsua ei tunnistettu."
 	},
 	"common.invitationNotSupported": {
@@ -1569,7 +1575,7 @@
 		"message": "Invitation type not allowed.",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 216]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 212]],
 		"translation": "Kutsun tyyppi ei ole sallittu."
 	},
 	"common.fields.issuedAt": {
@@ -1586,8 +1592,8 @@
 		},
 		"comments": ["Prefix before issuer name", "Prefix before issuer name"],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 106],
-			["src/features/wallet/FunkeCredentialDetailScreen.tsx", 95]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 107],
+			["src/features/wallet/FunkeCredentialDetailScreen.tsx", 96]
 		],
 		"translation": "Myöntäjä: {0}."
 	},
@@ -1608,7 +1614,7 @@
 			"0": ["formatDate(issuedAt, { includeTime: false })"]
 		},
 		"comments": ["Label before the date a credential was issued"],
-		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 192]],
+		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 195]],
 		"translation": "Myönnetty {0}"
 	},
 	"common.fields.issuer": {
@@ -1645,7 +1651,7 @@
 		"message": "Language",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 63]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 65]],
 		"translation": "Kieli"
 	},
 	"verifyPartySlide.hasPreviousInteractionsDescription": {
@@ -1654,16 +1660,14 @@
 			"0": ["formatRelativeDate(new Date(lastInteractionDate))"]
 		},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 236]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 237]],
 		"translation": "Viimeisin yhteys: {0}"
 	},
 	"predicate.lessThan": {
 		"message": "less than",
 		"placeholders": {},
 		"comments": ["Used in predicate statements like: age less than 18"],
-		"origin": [
-			["../../packages/agent/src/hooks/useDidCommPresentationActions.ts", 39]
-		],
+		"origin": [["src/utils/formatePredicate.ts", 15]],
 		"translation": "pienempi kuin"
 	},
 	"predicate.lessThanOrEqual": {
@@ -1672,9 +1676,7 @@
 		"comments": [
 			"Used in predicate statements like: age less than or equal to 18"
 		],
-		"origin": [
-			["../../packages/agent/src/hooks/useDidCommPresentationActions.ts", 44]
-		],
+		"origin": [["src/utils/formatePredicate.ts", 20]],
 		"translation": "pienempi tai yhtä suuri kuin"
 	},
 	"cardLifecycle.batch.title": {
@@ -1688,7 +1690,7 @@
 		"message": "Loading invitation",
 		"placeholders": {},
 		"comments": ["Text shown while an invitation is loading"],
-		"origin": [["../../packages/app/src/features/scan/ScanScreen.tsx", 89]],
+		"origin": [["../../packages/app/src/features/scan/ScanScreen.tsx", 83]],
 		"translation": "Ladataan kutsua"
 	},
 	"common.fields.locality": {
@@ -1702,7 +1704,7 @@
 		"message": "Menu",
 		"placeholders": {},
 		"comments": ["Aria label for the inbox/bell icon in the header"],
-		"origin": [["src/features/wallet/components/InboxIcon.tsx", 18]],
+		"origin": [["src/features/wallet/components/InboxIcon.tsx", 16]],
 		"translation": "Valikko"
 	},
 	"menu.title": {
@@ -1717,7 +1719,7 @@
 		"placeholders": {},
 		"comments": ["Header for metadata attributes of a credential"],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 131]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 130]
 		],
 		"translation": "Metatiedot"
 	},
@@ -1786,7 +1788,7 @@
 		"placeholders": {},
 		"comments": ["Error toast when a credential has no displayable attributes"],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 74]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 73]
 		],
 		"translation": "Tietoja ei löytynyt"
 	},
@@ -1796,7 +1798,7 @@
 			"searchQuery": ["searchQuery"]
 		},
 		"comments": ["Shown when search yields no results; includes query string"],
-		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 125]],
+		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 128]],
 		"translation": "Ei kortteja haulle \"{searchQuery}\""
 	},
 	"credentials.noCardsMessage": {
@@ -1815,7 +1817,7 @@
 			"Shown when the user tries to accept a proof but no credentials are loaded"
 		],
 		"origin": [
-			["src/features/share/FunkeOpenIdPresentationNotificationScreen.tsx", 49]
+			["src/features/share/FunkeOpenIdPresentationNotificationScreen.tsx", 45]
 		],
 		"translation": "Todisteita ei valittu"
 	},
@@ -1823,7 +1825,7 @@
 		"message": "No credentials were shared.",
 		"placeholders": {},
 		"comments": ["Shown when sharing failed and no credentials were shared"],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 229]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 231]],
 		"translation": "Todisteita ei jaettu."
 	},
 	"submission.fallbackPurpose": {
@@ -1839,7 +1841,7 @@
 		"comments": [
 			"Shown as a warning to the user when the verifier did not provide a purpose for the request. The user can still continue to accept if they wish."
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 84]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 86]],
 		"translation": "Tietopyynnön tarkoituksesta ei annettu tietoa. Ole varovainen"
 	},
 	"network.noInternet": {
@@ -1866,14 +1868,14 @@
 		"comments": [
 			"Error shown when a DIDComm invitation is missing in the URL parameters"
 		],
-		"origin": [["src/features/didcomm/DidCommNotificationScreen.tsx", 30]],
+		"origin": [["src/features/didcomm/DidCommNotificationScreen.tsx", 32]],
 		"translation": "Kutsua ei löytynyt. Yritä uudelleen."
 	},
 	"verifyPartySlide.hasNoPreviousInteractionsDescription": {
 		"message": "No previous interactions found",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 240]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 241]],
 		"translation": "Aiempia yhteyksiä ei löytynyt"
 	},
 	"onboardingDataProtection.toast.secureDevice": {
@@ -1921,14 +1923,14 @@
 		"message": "Organization is not verified",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 201]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 202]],
 		"translation": "Organisaatiota ei ole vahvistettu"
 	},
 	"verifyPartySlide.organizationNotVerifiedHeading": {
 		"message": "Organization not verified",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 125]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 126]],
 		"translation": "Organisaatio ei ole vahvistettu"
 	},
 	"requestPurpose.infoSheet.title": {
@@ -1944,7 +1946,7 @@
 		"message": "Pending",
 		"placeholders": {},
 		"comments": ["Label for a notification about a pending credential"],
-		"origin": [["src/features/didcomm/InboxScreen.tsx", 73]],
+		"origin": [["src/features/didcomm/InboxScreen.tsx", 72]],
 		"translation": "Odottaa"
 	},
 	"activity.latest.pendingCard": {
@@ -1961,7 +1963,7 @@
 		"placeholders": {},
 		"comments": ["Title of the pending credential notification screen"],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 101]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 102]
 		],
 		"translation": "Odottava kortti"
 	},
@@ -1979,7 +1981,7 @@
 		"placeholders": {},
 		"comments": ["Shown when PIN is required but not provided"],
 		"origin": [
-			["src/features/share/FunkeOpenIdPresentationNotificationScreen.tsx", 55]
+			["src/features/share/FunkeOpenIdPresentationNotificationScreen.tsx", 51]
 		],
 		"translation": "PIN-tunnistautuminen epäonnistui"
 	},
@@ -1987,15 +1989,8 @@
 		"message": "Pin entries do not match",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/onboarding/onboardingContext.tsx", 122]],
+		"origin": [["src/features/onboarding/onboardingContext.tsx", 103]],
 		"translation": "PIN-koodit eivät täsmää"
-	},
-	"common.pinRequiredToAcceptPresentation": {
-		"message": "PIN is required to accept the presentation.",
-		"placeholders": {},
-		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 96]],
-		"translation": "PIN-koodi vaaditaan jakamisen hyväksymiseen."
 	},
 	"common.fields.placeOfBirth": {
 		"message": "Place of birth",
@@ -2041,7 +2036,7 @@
 		"message": "Please try again",
 		"placeholders": {},
 		"comments": ["Shown when an action should be retried."],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 161]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 157]],
 		"translation": "Yritä uudelleen"
 	},
 	"nfcScanner.error.description": {
@@ -2096,7 +2091,7 @@
 		"comments": [
 			"Toast or message shown when a presentation could not be shared"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 120]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 116]],
 		"translation": "Todisteen tietojem jakaminen epäonnistui."
 	},
 	"common.presentationInformationCouldNotBeExtracted": {
@@ -2105,14 +2100,14 @@
 		"comments": [
 			"Toast or message shown when a presentation request could not be parsed correctly"
 		],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 115]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 111]],
 		"translation": "Tietopyynnön tietoja ei voitu lukea"
 	},
 	"verifyPartySlide.hasPreviousInteractionsTitle": {
 		"message": "Previous interactions",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 225]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 226]],
 		"translation": "Aiemmat yhteydet"
 	},
 	"funkeAboutScreen.privacyPolicyTitle": {
@@ -2126,7 +2121,7 @@
 		"message": "Proof has been declined",
 		"placeholders": {},
 		"comments": ["Shown when user declines sharing proof"],
-		"origin": [["src/features/share/FunkeMdocOfflineSharingScreen.tsx", 151]],
+		"origin": [["src/features/share/FunkeMdocOfflineSharingScreen.tsx", 154]],
 		"translation": "Tietojen jakaminen on hylätty"
 	},
 	"pidSetup.dataProtection.title": {
@@ -2193,7 +2188,7 @@
 			"0": ["activity.entity.name"]
 		},
 		"comments": ["Shown in activity detail when receiving credentials failed"],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 122]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 124]],
 		"translation": "Korttien vastaanottaminen kohteesta {0} epäonnistui."
 	},
 	"activity.receivedStopped": {
@@ -2204,7 +2199,7 @@
 		"comments": [
 			"Shown in activity detail when receiving credentials was cancelled by the user"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 129]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 131]],
 		"translation": "Korttien vastaanottaminen kohteesta {0} peruttiin."
 	},
 	"activity.latest.title": {
@@ -2218,7 +2213,7 @@
 		"message": "Recognized organization",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 178]],
+		"origin": [["src/features/receive/slides/VerifyPartySlide.tsx", 179]],
 		"translation": "Luotettu toimija"
 	},
 	"cardLifecycle.refreshCardButton": {
@@ -2246,7 +2241,7 @@
 		"message": "Request",
 		"placeholders": {},
 		"comments": ["Label for a notification about a proof request"],
-		"origin": [["src/features/didcomm/InboxScreen.tsx", 84]],
+		"origin": [["src/features/didcomm/InboxScreen.tsx", 83]],
 		"translation": "Pyyntö"
 	},
 	"requestedAttributes.heading": {
@@ -2263,7 +2258,7 @@
 		"placeholders": {},
 		"comments": ["Heading shown above a list of requested cards the user has"],
 		"origin": [
-			["src/features/share/components/RequestedAttributesSection.tsx", 22]
+			["src/features/share/components/RequestedAttributesSection.tsx", 25]
 		],
 		"translation": "PYYDETYT KORTIT"
 	},
@@ -2273,14 +2268,14 @@
 		"comments": [
 			"Heading shown when the request did not result in attributes being shared"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 105]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 107]],
 		"translation": "Pyydetyt tiedot"
 	},
 	"onboarding.resetAlert.title": {
 		"message": "Reset Onboarding",
 		"placeholders": {},
 		"comments": ["Title of the alert when user attempts to reset onboarding"],
-		"origin": [["src/app/onboarding/index.tsx", 45]],
+		"origin": [["src/app/onboarding/index.tsx", 49]],
 		"translation": "Nollaa käyttöönotto"
 	},
 	"common.reset": {
@@ -2290,11 +2285,18 @@
 		"origin": [["../../packages/translations/src/commonMessages.ts", 61]],
 		"translation": "Nollaa lompakko"
 	},
+	"common.invitationResolvedParameterMissing": {
+		"message": "Resolved parameter is missing, but required for accepting an invitation.",
+		"placeholders": {},
+		"comments": [],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 220]],
+		"translation": "Resolved-parametri puuttuu, mutta se tarvitaan kutsun hyväksymiseen."
+	},
 	"signShare.title": {
 		"message": "Review the request",
 		"placeholders": {},
 		"comments": ["Main heading in the sign & share screen"],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 72]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 73]],
 		"translation": "Tarkista pyyntö"
 	},
 	"submission.reviewTitle": {
@@ -2382,7 +2384,7 @@
 		"message": "Search cards",
 		"placeholders": {},
 		"comments": ["Placeholder for search input in credentials list"],
-		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 91]],
+		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 94]],
 		"translation": "Hae kortteja"
 	},
 	"onboardingIntroduction.step1.title": {
@@ -2393,15 +2395,6 @@
 		],
 		"origin": [["src/features/onboarding/screens/introduction-steps.tsx", 24]],
 		"translation": "Suojaa lompakko"
-	},
-	"pinSlide.title": {
-		"message": "Send data with your PIN code",
-		"placeholders": {},
-		"comments": [
-			"Heading shown when user is asked to enter their app PIN to confirm a request"
-		],
-		"origin": [["src/features/share/slides/PinSlide.tsx", 39]],
-		"translation": "Lähetä tiedot PIN-koodillasi"
 	},
 	"onboarding.biometrics.title": {
 		"message": "Set up biometrics",
@@ -2421,7 +2414,7 @@
 		"message": "Settings",
 		"placeholders": {},
 		"comments": ["Header title for the settings screen"],
-		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 155]],
+		"origin": [["src/features/menu/FunkeSettingsScreen.tsx", 171]],
 		"translation": "Asetukset"
 	},
 	"menu.item.settings": {
@@ -2450,7 +2443,7 @@
 		"placeholders": {},
 		"comments": ["Header for attributes that can be shared with a verifier"],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 112]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 111]
 		],
 		"translation": "Jaettavat tiedot"
 	},
@@ -2460,7 +2453,7 @@
 		"comments": [
 			"Heading shown when attributes were successfully shared in an activity"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 100]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 102]],
 		"translation": "Jaetut tiedot"
 	},
 	"activity.latest.sharedCard": {
@@ -2510,7 +2503,7 @@
 		"placeholders": {},
 		"comments": ["Button label: toggles visibility of metadata attributes"],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 182]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 181]
 		],
 		"translation": "Näytä metatiedot"
 	},
@@ -2537,7 +2530,7 @@
 			"Button label that toggles visibility of shareable attributes"
 		],
 		"origin": [
-			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 165]
+			["src/features/wallet/FunkeCredentialDetailAttributesScreen.tsx", 164]
 		],
 		"translation": "Näytä jaettavat tiedot"
 	},
@@ -2552,7 +2545,7 @@
 		"message": "Sign & share",
 		"placeholders": {},
 		"comments": ["Button label for accepting a sign-and-share request"],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 62]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 63]],
 		"translation": "Allekirjoita ja jaa"
 	},
 	"common.credentials.mdl.signature_usual_mark": {
@@ -2580,7 +2573,7 @@
 		"message": "Signing card",
 		"placeholders": {},
 		"comments": ["Heading above the signing card"],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 125]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 126]],
 		"translation": "Allekirjoituskortti"
 	},
 	"activity.latest.signingFailed": {
@@ -2612,7 +2605,7 @@
 		"comments": [
 			"Shown under the document name to indicate which QTSP is used for signing"
 		],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 56]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 57]],
 		"translation": "Allekirjoitetaan palvelulla {0}"
 	},
 	"activity.signedWithQTSP": {
@@ -2623,14 +2616,14 @@
 		"comments": [
 			"Shown below a document name to indicate the user signed it with a specific QTSP"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 265]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 267]],
 		"translation": "Allekirjoitettu palvelulla {0}"
 	},
 	"common.simulatorEidCardActivated": {
 		"message": "Simulator eID card activated",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 157]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 153]],
 		"translation": "Simuloitu henkilökortti aktivoitu"
 	},
 	"onboardingWalletExplanation.skip": {
@@ -2653,7 +2646,7 @@
 		"message": "Something went wrong",
 		"placeholders": {},
 		"comments": ["General title/message shown when something went wrong"],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 166]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 162]],
 		"translation": "Jokin meni vikaan"
 	},
 	"onboardingIdCardScan.startScanning": {
@@ -2696,7 +2689,8 @@
 		"placeholders": {},
 		"comments": [],
 		"origin": [
-			["src/features/receive/FunkeOpenIdCredentialNotificationScreen.tsx", 564]
+			["src/features/receive/FunkeOpenIdCredentialNotificationScreen.tsx", 286],
+			["src/features/receive/FunkeOpenIdCredentialNotificationScreen.tsx", 438]
 		],
 		"translation": "Lopeta korttitarjous?"
 	},
@@ -2788,7 +2782,7 @@
 		"comments": [
 			"Shown in activity detail when the received credentials are pending"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 136]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 138]],
 		"translation": "Kortit kohteesta {0} eivät ole vielä valmiita ja noudetaan myöhemmin."
 	},
 	"onboardingWalletExplanation.slide2.subtitle": {
@@ -2802,14 +2796,14 @@
 		"message": "The document was not signed.",
 		"placeholders": {},
 		"comments": ["Shown after a failed digital signature"],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 95]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 97]],
 		"translation": "Asiakirjaa ei allekirjoitettu."
 	},
 	"activity.documentSigned": {
 		"message": "The document was signed.",
 		"placeholders": {},
 		"comments": ["Shown after a successful digital signature"],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 90]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 92]],
 		"translation": "Asiakirja allekirjoitettiin."
 	},
 	"cardLifecycle.limitedByDate.expired.description": {
@@ -2837,7 +2831,7 @@
 		"placeholders": {},
 		"comments": ["Description when the user has all requested cards"],
 		"origin": [
-			["src/features/share/components/RequestedAttributesSection.tsx", 34]
+			["src/features/share/components/RequestedAttributesSection.tsx", 37]
 		],
 		"translation": "Seuraavat kortit jaetaan."
 	},
@@ -2845,14 +2839,14 @@
 		"message": "The following document will be signed.",
 		"placeholders": {},
 		"comments": ["Text above the document to be signed"],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 105]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 106]],
 		"translation": "Seuraava asiakirja allekirjoitetaan."
 	},
 	"signShare.cardIntro": {
 		"message": "The following personal information will be used to sign the document.",
 		"placeholders": {},
 		"comments": ["Explains which info will be used to sign"],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 130]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 131]],
 		"translation": "Seuraavia henkilötietoja käytetään asiakirjan allekirjoittamiseen."
 	},
 	"deferredCredentials.cardNotAvailableYetDescription": {
@@ -2860,7 +2854,7 @@
 		"placeholders": {},
 		"comments": ["Description of the info box explaining the card is pending"],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 174]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 175]
 		],
 		"translation": "Myöntäjä ei ole vielä tehnyt korttia saataville. Yritä myöhemmin uudelleen."
 	},
@@ -2882,7 +2876,7 @@
 			"Description of the info box explaining the card is pending with expected time"
 		],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 136]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 137]
 		],
 		"translation": "Kortin myöntäjä ehdottaa, että tarkistat uudelleen kello {0}."
 	},
@@ -2897,7 +2891,7 @@
 			"Description of the info box explaining the card is pending with expected date"
 		],
 		"origin": [
-			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 153]
+			["src/features/receive/DeferredCredentialNotificationScreen.tsx", 154]
 		],
 		"translation": "Kortin myöntäjä ehdottaa, että tarkistat uudelleen {0}."
 	},
@@ -2937,7 +2931,7 @@
 		"comments": [
 			"A message shown when there are no organizations that approved the current party"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 122]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 120]],
 		"translation": "Mikään organisaatio ei luota toimijaan {name}."
 	},
 	"trust.noApprovalsWithoutOrganizationName": {
@@ -2946,21 +2940,21 @@
 		"comments": [
 			"A message shown when there are no organizations that approved the current party, but the organization name is not known"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 127]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 125]],
 		"translation": "Mikään organisaatio ei luota tähän toimijaan."
 	},
 	"credentials.emptyTitle": {
 		"message": "There's nothing here, yet",
 		"placeholders": {},
 		"comments": ["Shown when the user has no credentials"],
-		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 65]],
+		"origin": [["src/features/wallet/FunkeCredentialsScreen.tsx", 68]],
 		"translation": "Täällä ei ole vielä mitään"
 	},
 	"activity.emptyTitle": {
 		"message": "There's nothing here, yet",
 		"placeholders": {},
 		"comments": ["Shown when the user has no activity items yet"],
-		"origin": [["src/features/activity/FunkeActivityScreen.tsx", 27]],
+		"origin": [["src/features/activity/FunkeActivityScreen.tsx", 26]],
 		"translation": "Täällä ei ole vielä mitään"
 	},
 	"onboardingIdCardRequestedAttributes.description": {
@@ -3046,7 +3040,7 @@
 		"message": "This feature is not supported in this version of the app.",
 		"placeholders": {},
 		"comments": ["Shown when a feature that is not supported is accessed"],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 175]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 171]],
 		"translation": "Ominaisuus ei toimi tässä sovelluksen versiossa."
 	},
 	"submission.offlineRequestTitle": {
@@ -3151,7 +3145,7 @@
 		"message": "To receive this card, you need to authorize with your account. You will now be redirected to the issuer's website.",
 		"placeholders": {},
 		"comments": ["Explanation for why user is redirected to external site"],
-		"origin": [["src/features/receive/slides/AuthCodeFlowSlide.tsx", 136]],
+		"origin": [["src/features/receive/slides/AuthCodeFlowSlide.tsx", 138]],
 		"translation": "Vastaanottaaksesi tämän kortin sinun tulee krjautua. Sinut ohjataan nyt myöntäjän verkkosivulle."
 	},
 	"dateFormatting.today": {
@@ -3170,15 +3164,6 @@
 		"origin": [["../../packages/utils/src/format.ts", 48]],
 		"translation": "Tänään klo {0}"
 	},
-	"pinLocked.title": {
-		"message": "Too many incorrect attempts",
-		"placeholders": {},
-		"comments": [
-			"Heading shown when the user has entered too many incorrect PINs"
-		],
-		"origin": [["src/features/wallet/FunkePinLockedScreen.tsx", 42]],
-		"translation": "Liian monta väärää yritystä"
-	},
 	"txCodeSlide.inputLabel": {
 		"message": "Transaction code",
 		"placeholders": {},
@@ -3194,7 +3179,7 @@
 		"comments": [
 			"Subheading for list of organizations that trust the current one"
 		],
-		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 102]],
+		"origin": [["src/features/wallet/FunkeTrustDetailScreen.tsx", 100]],
 		"translation": "Luottamuksen osoittajat"
 	},
 	"common.credentials.mdl.unDistinguishingSign": {
@@ -3208,7 +3193,7 @@
 		"message": "Unable to retrieve invitation.",
 		"placeholders": {},
 		"comments": ["Shown when fetching an invitation from a URL fails"],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 206]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 202]],
 		"translation": "Kutsun hakeminen epäonnistui."
 	},
 	"requestedAttributes.unavailableCardsHeading": {
@@ -3218,7 +3203,7 @@
 			"Heading shown above a list of requested cards the user does not have"
 		],
 		"origin": [
-			["src/features/share/components/RequestedAttributesSection.tsx", 28]
+			["src/features/share/components/RequestedAttributesSection.tsx", 31]
 		],
 		"translation": "PUUTTUVAT KORTIT"
 	},
@@ -3226,24 +3211,15 @@
 		"message": "Unknown",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 192]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 188]],
 		"translation": "Tuntematon"
 	},
 	"common.unknownOrganization": {
 		"message": "Unknown Organization",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["../../packages/translations/src/commonMessages.ts", 196]],
+		"origin": [["../../packages/translations/src/commonMessages.ts", 192]],
 		"translation": "Tuntematon organisaatio"
-	},
-	"activity.unknownVerifier": {
-		"message": "Unknown verifier",
-		"placeholders": {},
-		"comments": [
-			"Fallback name shown when the verifier/issuer name is missing"
-		],
-		"origin": [["../../packages/agent/src/storage/activityStore.ts", 231]],
-		"translation": "Tuntematon vastaanottaja"
 	},
 	"onboardingIdCardVerify.unlock": {
 		"message": "Unlock with biometrics",
@@ -3265,13 +3241,6 @@
 		"comments": ["Instruction heading for scanning a QR code"],
 		"origin": [["../../packages/scanner/src/Scanner.tsx", 74]],
 		"translation": "Käytä kameraa QR-koodin skannaamiseen"
-	},
-	"pinSlide.description": {
-		"message": "Use your app PIN code to confirm the request.",
-		"placeholders": {},
-		"comments": ["Supporting text explaining why PIN is needed"],
-		"origin": [["src/features/share/slides/PinSlide.tsx", 47]],
-		"translation": "Käytä sovelluksen PIN-koodisi vahvistaaksesi pyynnön."
 	},
 	"onboardingIntroduction.step2.description": {
 		"message": "Use your ID card PIN to retrieve your identity information.",
@@ -3314,14 +3283,14 @@
 		"message": "Verify your account",
 		"placeholders": {},
 		"comments": ["Heading shown when user is about to authenticate"],
-		"origin": [["src/features/receive/slides/AuthCodeFlowSlide.tsx", 131]],
+		"origin": [["src/features/receive/slides/AuthCodeFlowSlide.tsx", 133]],
 		"translation": "Vahvista tilisi"
 	},
 	"credentials.cardAttributesDescription": {
 		"message": "View attributes of the card",
 		"placeholders": {},
 		"comments": ["Description text for the attributes button"],
-		"origin": [["src/features/wallet/FunkeCredentialDetailScreen.tsx", 113]],
+		"origin": [["src/features/wallet/FunkeCredentialDetailScreen.tsx", 114]],
 		"translation": "Näytä kortin tiedot"
 	},
 	"menu.section.wallet": {
@@ -3475,7 +3444,7 @@
 			"Description when the user has some but not all requested cards"
 		],
 		"origin": [
-			["src/features/share/components/RequestedAttributesSection.tsx", 46]
+			["src/features/share/components/RequestedAttributesSection.tsx", 49]
 		],
 		"translation": "Sinulla ei ole kaikkia pyydettyjä kortteja."
 	},
@@ -3483,7 +3452,7 @@
 		"message": "You don't have any notifications at the moment.",
 		"placeholders": {},
 		"comments": ["Paragraph shown when the inbox is empty"],
-		"origin": [["src/features/didcomm/InboxScreen.tsx", 63]],
+		"origin": [["src/features/didcomm/InboxScreen.tsx", 62]],
 		"translation": "Sinulla ei ole tällä hetkellä ilmoituksia."
 	},
 	"noContentInbox.message": {
@@ -3498,7 +3467,7 @@
 		"placeholders": {},
 		"comments": ["Description when the user has none of the requested cards"],
 		"origin": [
-			["src/features/share/components/RequestedAttributesSection.tsx", 40]
+			["src/features/share/components/RequestedAttributesSection.tsx", 43]
 		],
 		"translation": "Sinulla ei ole pyydettyjä kortteja."
 	},
@@ -3506,7 +3475,7 @@
 		"message": "You don't have the required cards",
 		"placeholders": {},
 		"comments": ["Shown when the user lacks the required credentials"],
-		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 180]],
+		"origin": [["src/features/share/slides/SignAndShareSlide.tsx", 183]],
 		"translation": "Sinulla ei ole tarvittavia kortteja"
 	},
 	"submission.missingCardsWarning": {
@@ -3516,15 +3485,6 @@
 		"origin": [["src/features/share/slides/ShareCredentialsSlide.tsx", 130]],
 		"translation": "Sinulla ei ole tarvittavia kortteja"
 	},
-	"pinLocked.description": {
-		"message": "You have entered an incorrect PIN. The wallet was locked, please reset it to set a new PIN and continue.",
-		"placeholders": {},
-		"comments": [
-			"Descriptive text explaining that the wallet is locked and must be reset"
-		],
-		"origin": [["src/features/wallet/FunkePinLockedScreen.tsx", 47]],
-		"translation": "Olet syöttänyt väärän PIN-koodin. Lompakko lukittiin. Nollaa lompakko asettaaksesi uuden PIN-koodin ja jatkaaksesi."
-	},
 	"activity.receivedSingle": {
 		"message": "You have received the following card from {0}.",
 		"placeholders": {
@@ -3533,7 +3493,7 @@
 		"comments": [
 			"Shown in activity detail when one credential has been received"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 150]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 152]],
 		"translation": "Olet vastaanottanut seuraavan kortin taholta {0}."
 	},
 	"activity.receivedMultiple": {
@@ -3544,7 +3504,7 @@
 		"comments": [
 			"Shown in activity detail when multiple credentials have been received"
 		],
-		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 144]],
+		"origin": [["src/features/activity/FunkeActivityDetailScreen.tsx", 146]],
 		"translation": "Olet vastaanottanut seuraavat kortit taholta {0}."
 	},
 	"pidSetup.enableBiometrics.title": {
@@ -3565,7 +3525,7 @@
 		"message": "You're all caught up",
 		"placeholders": {},
 		"comments": ["Heading shown when the inbox is empty"],
-		"origin": [["src/features/didcomm/InboxScreen.tsx", 58]],
+		"origin": [["src/features/didcomm/InboxScreen.tsx", 57]],
 		"translation": "Olet ajan tasalla"
 	},
 	"noContentInbox.heading": {
@@ -3625,7 +3585,7 @@
 		"message": "Your PIN is required to unlock the app",
 		"placeholders": {},
 		"comments": [],
-		"origin": [["src/app/authenticate.tsx", 104]],
+		"origin": [["src/app/authenticate.tsx", 85]],
 		"translation": "PIN-koodisi tarvitaan sovelluksen avaamiseen"
 	}
 }
