@@ -1,4 +1,5 @@
 import { setupWalletServiceProvider } from '@easypid/crypto/WalletServiceProviderClient'
+import { useDevelopmentMode, useDisableRelyingPartyVerification } from '@easypid/hooks'
 import { useLingui } from '@lingui/react/macro'
 import { PinDotsInput, type PinDotsInputRef } from '@package/app'
 import { commonMessages, TranslationProvider } from '@package/translations'
@@ -36,6 +37,8 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
   const insets = useSafeAreaInsets()
   const { t } = useLingui()
   const paradym = useParadym()
+  const [isDevelopmentModeEnabled] = useDevelopmentMode()
+  const [isRelyingPartyVerificationDisabled] = useDisableRelyingPartyVerification()
 
   const onShareResponse = async () => {
     if (paradym.state !== 'unlocked') {
@@ -43,7 +46,10 @@ export function DcApiSharingScreenWithContext({ request }: DcApiSharingScreenPro
     }
 
     const resolvedRequest = await paradym.paradym.dcApi
-      .resolveRequest({ request })
+      .resolveRequest({
+        request,
+        allowUntrusted: isDevelopmentModeEnabled && isRelyingPartyVerificationDisabled,
+      })
       .then((resolvedRequest) => {
         // We can't share multiple documents at the moment
         if (resolvedRequest.formattedSubmission.entries.length > 1) {

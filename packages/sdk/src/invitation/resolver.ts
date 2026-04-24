@@ -91,6 +91,7 @@ export type ResolveCredentialOfferOptions = {
   offerUri: string
   authorization?: { clientId: string; redirectUri: string }
   fetchAuthorization?: boolean
+  allowUntrusted?: boolean
 }
 
 // TODO: export from openid4vc
@@ -153,6 +154,7 @@ export async function resolveCredentialOffer({
   offerUri,
   authorization,
   fetchAuthorization = true,
+  allowUntrusted,
 }: ResolveCredentialOfferOptions): Promise<ResolveCredentialOfferReturn> {
   assertAgentType(paradym.agent, 'openid4vc')
   paradym.logger.info(`Receiving openid uri '${offerUri}'`)
@@ -206,6 +208,7 @@ export async function resolveCredentialOffer({
       const credentialsForProofRequest = await resolveCredentialRequest({
         paradym,
         uri: resolvedAuthorizationRequest.openid4vpRequestUrl,
+        allowUntrusted,
       })
 
       return {

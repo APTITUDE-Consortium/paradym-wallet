@@ -1,5 +1,5 @@
 import { walletClient } from '@easypid/constants'
-import { useDevelopmentMode } from '@easypid/hooks'
+import { useDevelopmentMode, useDisableRelyingPartyVerification } from '@easypid/hooks'
 import { dcApiRegisterOptions } from '@easypid/utils/dcApiRegisterOptions'
 import { useLingui } from '@lingui/react/macro'
 import { SlideWizard, usePushToWallet } from '@package/app'
@@ -36,6 +36,7 @@ export function FunkeCredentialNotificationScreen() {
   const { t } = useLingui()
   const pushToWallet = usePushToWallet()
   const [isDevelopmentModeEnabled] = useDevelopmentMode()
+  const [isRelyingPartyVerificationDisabled] = useDisableRelyingPartyVerification()
 
   const [errorReason, setErrorReason] = useState<string>()
   const [isCompleted, setIsCompleted] = useState(false)
@@ -70,6 +71,7 @@ export function FunkeCredentialNotificationScreen() {
       .resolveCredentialOffer({
         offerUri: params.uri,
         authorization: walletClient,
+        allowUntrusted: isDevelopmentModeEnabled && isRelyingPartyVerificationDisabled,
       })
       .then((result) => {
         setResolvedCredentialOffer(result)
@@ -80,7 +82,7 @@ export function FunkeCredentialNotificationScreen() {
           error,
         })
       })
-  }, [params.uri, paradym, setErrorReasonWithError, t])
+  }, [params.uri, paradym, isDevelopmentModeEnabled, isRelyingPartyVerificationDisabled, setErrorReasonWithError, t])
 
   const onPresentationAccept = useCallback(
     async ({ pin, onPinComplete, onPinError }: OnPinSubmitProps = {}) => {

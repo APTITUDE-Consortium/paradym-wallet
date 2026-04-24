@@ -15,6 +15,7 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { setWalletServiceProviderPin } from '../../crypto/WalletServiceProviderClient'
+import { useDisableRelyingPartyVerification } from '../../hooks/useDisableRelyingPartyVerification'
 import { useShouldUsePinForSubmission } from '../../hooks/useShouldUsePinForPresentation'
 import { FunkePresentationNotificationScreen } from './FunkePresentationNotificationScreen'
 import type { OnPinSubmitProps } from './slides/PinSlide'
@@ -29,6 +30,7 @@ export function FunkeOpenIdPresentationNotificationScreen() {
   const params = useLocalSearchParams<Query>()
   const pushToWallet = usePushToWallet()
   const [isDevelopmentModeEnabled] = useDevelopmentMode()
+  const [isRelyingPartyVerificationDisabled] = useDisableRelyingPartyVerification()
   const [errorReason, setErrorReason] = useState<string>()
 
   const [resolvedRequest, setResolvedRequest] = useState<CredentialsForProofRequest>()
@@ -66,6 +68,7 @@ export function FunkeOpenIdPresentationNotificationScreen() {
     paradym.openid4vc
       .resolveCredentialRequest({
         uri: params.uri,
+        allowUntrusted: isDevelopmentModeEnabled && isRelyingPartyVerificationDisabled,
       })
       .then((r) => setResolvedRequest(r))
       .catch((error) => {
@@ -77,7 +80,15 @@ export function FunkeOpenIdPresentationNotificationScreen() {
           description: errorMessage,
         })
       })
-  }, [resolvedRequest, params.uri, paradym.openid4vc, isDevelopmentModeEnabled, handleError, t])
+  }, [
+    resolvedRequest,
+    params.uri,
+    paradym.openid4vc,
+    isDevelopmentModeEnabled,
+    isRelyingPartyVerificationDisabled,
+    handleError,
+    t,
+  ])
 
   const { checkForOverAsking, isProcessingOverAsking, overAskingResponse, stopOverAsking } = useOverAskingAi()
 

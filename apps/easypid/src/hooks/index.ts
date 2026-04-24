@@ -1,4 +1,5 @@
 export * from './useDevelopmentMode'
+export * from './useDisableRelyingPartyVerification'
 export * from './useFirstNameFromPid'
 export * from './useOverAskingAi'
 export * from './useWalletReset'

@@ -6,9 +6,10 @@ import { getHostNameFromUrl } from '../utils/url'
 export type DcApiResolveRequestOptions = {
   paradym: ParadymWalletSdk
   request: DigitalCredentialsRequest
+  allowUntrusted?: boolean
 }
 
-export async function dcApiResolveRequest({ paradym, request }: DcApiResolveRequestOptions) {
+export async function dcApiResolveRequest({ paradym, request, allowUntrusted }: DcApiResolveRequestOptions) {
   const providerRequest = request.request.requests
     ? request.request.requests[request.selectedEntry.providerIndex].data
     : request.request.providers[request.selectedEntry.providerIndex].request
@@ -21,6 +22,7 @@ export async function dcApiResolveRequest({ paradym, request }: DcApiResolveRequ
     paradym,
     requestPayload: authorizationRequestPayload,
     origin: request.origin,
+    allowUntrusted,
   })
 
   if (result.formattedSubmission.entries.length !== 1) {
